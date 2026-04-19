@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>ScoreStore UI Kit — Presentation</title>
+<script src="../deck-stage.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #000; font-family: 'Noto Sans KR', Arial, sans-serif; }
+
+section {
+  width: 1920px; height: 1080px;
+  position: relative;
+  overflow: hidden;
+  background: #0F172A;
+}
+
+/* ── Shared layout helpers ── */
+.screen-frame {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 390px; height: 780px;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
+}
+.screen-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+
+.label-col {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.label-col.left  { left: 120px; max-width: 520px; }
+.label-col.right { right: 120px; max-width: 520px; }
+
+.eyebrow {
+  font-size: 14px; font-weight: 700; letter-spacing: 0.12em;
+  color: #F97316; text-transform: uppercase;
+}
+.heading {
+  font-size: 52px; font-weight: 700; line-height: 1.15;
+  color: #FFFFFF; word-break: keep-all;
+}
+.heading span { color: #F97316; }
+.body-text {
+  font-size: 18px; font-weight: 400; line-height: 1.7;
+  color: rgba(255,255,255,0.6); max-width: 460px; word-break: keep-all;
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3);
+  color: #F97316; border-radius: 9999px;
+  font-size: 13px; font-weight: 600; padding: 6px 16px;
+  width: fit-content;
+}
+.feature-list {
+  display: flex; flex-direction: column; gap: 12px;
+  margin-top: 8px;
+}
+.feature-item {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 16px; color: rgba(255,255,255,0.75);
+}
+.feature-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #F97316; flex-shrink: 0;
+}
+
+/* ── Slide 1: Cover ── */
+.cover-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(249,115,22,0.12) 0%, transparent 65%),
+              linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+}
+.cover-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+.cover-logo {
+  position: absolute; left: 120px; top: 80px;
+  font-size: 22px; font-weight: 700; letter-spacing: -0.01em;
+  display: flex; gap: 0; align-items: baseline;
+}
+.cover-logo span.o { color: #F97316; }
+.cover-logo span.d { color: #fff; }
+
+.cover-screens {
+  position: absolute; right: 100px; top: 50%;
+  transform: translateY(-50%);
+  display: flex; gap: -20px; align-items: center;
+}
+.cover-phone {
+  width: 220px; height: 440px; border-radius: 28px;
+  overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  flex-shrink: 0;
+}
+.cover-phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.cover-phone:nth-child(2) {
+  transform: scale(1.1) translateX(-20px);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(249,115,22,0.2);
+  z-index: 2;
+}
+.cover-phone:nth-child(3) { transform: translateX(-40px); z-index: 1; }
+
+/* Slide 6: component grid */
+.comp-grid {
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr; gap: 2px;
+  background: #0F172A;
+}
+.comp-cell {
+  background: #1E293B; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: rgba(255,255,255,0.3); flex-direction: column; gap: 8px;
+}
+.comp-cell .label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+</style>
+</head>
+<body>
+<deck-stage width="1920" height="1080">
+
+  <!-- 01 Cover -->
+  <section data-label="Cover">
+    <div class="cover-bg"></div>
+    <div class="cover-grid"></div>
+    <div class="cover-logo"><span class="o">Score</span><span class="d">Store</span><span class="o" style="font-size:18px;margin-left:2px">♪</span></div>
+
+    <div class="label-col left">
+      <div class="pill">UI Kit · 2025</div>
+      <div class="heading" style="font-size:64px">디지털 악보<br>마켓 <span>디자인 시스템</span></div>
+      <div class="body-text">온라인 악보 판매 플랫폼 ScoreStore의<br>컴포넌트 UI 킷 및 인터랙티브 프로토타입</div>
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-dot"></div>홈 · 상세 · 포인트충전 · 결제 플로우</div>
+        <div class="feature-item"><div class="feature-dot"></div>모바일 우선 반응형 설계</div>
+        <div class="feature-item"><div class="feature-dot"></div>한국어 · 영어 · 일본어 다국어 지원</div>
+      </div>
+    </div>
+
+    <div class="cover-screens">
+      <div class="cover-phone"><img src="../screenshots/03-screens.png" alt="포인트충전"></div>
+      <div class="cover-phone"><img src="../screenshots/01-screens.png" alt="홈"></div>
+      <div class="cover-phone"><img src="../screenshots/02-screens.png" alt="상세"></div>
+    </div>
+  </section>
+
+  <!-- 02 Home Screen -->
+  <section data-label="Home Screen">
+    <div class="cover-bg"></div>
+    <div class="screen-frame" style="left:38%">
+      <img src="../screenshots/01-screens.png" alt="Home">
+    </div>
+    <div class="label-col right" style="right:100px;max-width:480px">
+      <div class="eyebrow">Screen 01</div>
+      <div class="heading">홈 화면</div>
+      <div class="body-text">히어로 배너 슬라이드, 악기별 아이콘 바로가기, 무료악보 · 신곡 · 인기곡 · 악보집 섹션</div>
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-dot"></div>5초 자동 배너 슬라이드 (framer-motion)</div>
+        <div class="feature-item"><div class="feature-dot"></div>섹션별 더보기 내비게이션</div>
+        <div class="feature-item"><div class="feature-dot"></div>카카오톡 채널 플로팅 버튼</div>
+        <div class="feature-item"><div class="feature-dot"></div>모바일 하단 탭바 (5탭)</div>
+        <div class="feature-item"><div class="feature-dot"></div>헤더 포인트 잔액 뱃지</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Score Detail -->
+  <section data-label="Score Detail">
+    <div class="cover-bg"></div>
+    <div class="screen-frame" style="left:62%">
+      <img src="../screenshots/02-screens.png" alt="Detail">
+    </div>
+    <div class="label-col left">
+      <div class="eyebrow">Screen 02</div>
+      <div class="heading">악보 상세</div>
+      <div class="body-text">썸네일, 이중 난이도(★+●), 30초 미리듣기, 샘플 PDF, 하단 고정 구매 바</div>
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-dot"></div>★ 리듬 + ● 기법 이중 난이도</div>
+        <div class="feature-item"><div class="feature-dot"></div>TIME SALE 카운트다운 배지</div>
+        <div class="feature-item"><div class="feature-dot"></div>포인트 충분 시 💰 버튼 자동 전환</div>
+        <div class="feature-item"><div class="feature-dot"></div>무료 악보 → 🎁 무료 다운로드</div>
+        <div class="feature-item"><div class="feature-dot"></div>위시리스트 하트 토글</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 Point Charge -->
+  <section data-label="Point Charge">
+    <div class="cover-bg"></div>
+    <div class="screen-frame" style="left:38%">
+      <img src="../screenshots/03-screens.png" alt="Points">
+    </div>
+    <div class="label-col right" style="right:100px;max-width:480px">
+      <div class="eyebrow">Screen 03</div>
+      <div class="heading">포인트 충전</div>
+      <div class="body-text">하루한곡 벤치마킹 — 선충전 포인트 모델로 LTV 상승. 4단계 패키지 + 보너스%</div>
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-dot"></div>다크 카드 지갑 UI (잔액 / 유효기간)</div>
+        <div class="feature-item"><div class="feature-dot"></div>10k / 30k / 50k / 100k 패키지</div>
+        <div class="feature-item"><div class="feature-dot"></div>카드 / 카카오페이 / 네이버페이</div>
+        <div class="feature-item"><div class="feature-dot"></div>BEST 배지 + 보너스 포인트 강조</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Checkout & Complete -->
+  <section data-label="Checkout and Complete">
+    <div class="cover-bg"></div>
+    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:40px;align-items:center">
+      <div style="width:280px;height:560px;border-radius:32px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.6)">
+        <img src="../screenshots/04-screens.png" alt="Checkout" style="width:100%;height:100%;object-fit:cover;object-position:top">
+      </div>
+      <div style="width:280px;height:560px;border-radius:32px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.6)">
+        <img src="../screenshots/05-screens.png" alt="Complete" style="width:100%;height:100%;object-fit:cover;object-position:top">
+      </div>
+    </div>
+    <div class="label-col left" style="left:80px;top:50%;transform:translateY(-50%);max-width:400px">
+      <div class="eyebrow">Screen 04 – 05</div>
+      <div class="heading" style="font-size:44px">결제 플로우</div>
+      <div class="body-text">포인트 혼합결제 UI — 전액 포인트 커버 시 PG 생략, 즉시 완료</div>
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-dot"></div>포인트 부분/전액 사용 입력</div>
+        <div class="feature-item"><div class="feature-dot"></div>실 결제액 실시간 계산</div>
+        <div class="feature-item"><div class="feature-dot"></div>완료 후 적립 포인트 안내</div>
+        <div class="feature-item"><div class="feature-dot"></div>즉시 다운로드 CTA</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Design System Summary -->
+  <section data-label="Design System">
+    <div class="cover-bg"></div>
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:48px;padding:80px 120px">
+      <div style="text-align:center">
+        <div class="eyebrow" style="justify-content:center;display:flex;margin-bottom:12px">Design Tokens</div>
+        <div class="heading" style="font-size:48px;text-align:center">시각 파운데이션</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;width:100%">
+        <!-- Colors -->
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px">
+          <div class="eyebrow" style="margin-bottom:16px;font-size:11px">Colors</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:8px;background:#F97316;flex-shrink:0"></div><div style="font-size:13px;color:rgba(255,255,255,0.7)">Accent · Orange 500</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:8px;background:#0F172A;border:1px solid rgba(255,255,255,0.1);flex-shrink:0"></div><div style="font-size:13px;color:rgba(255,255,255,0.7)">Dark · Slate 900</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:8px;background:#FBBF24;flex-shrink:0"></div><div style="font-size:13px;color:rgba(255,255,255,0.7)">Points · Amber 400</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:8px;background:#10B981;flex-shrink:0"></div><div style="font-size:13px;color:rgba(255,255,255,0.7)">Free · Emerald 500</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:8px;background:#EF4444;flex-shrink:0"></div><div style="font-size:13px;color:rgba(255,255,255,0.7)">Sale · Red 500</div></div>
+          </div>
+        </div>
+        <!-- Type -->
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px">
+          <div class="eyebrow" style="margin-bottom:16px;font-size:11px">Typography</div>
+          <div style="font-family:Georgia,serif;font-size:28px;color:#fff;margin-bottom:8px">악보 디자이너</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:16px">MaruBuri Light — Display</div>
+          <div style="font-size:16px;color:rgba(255,255,255,0.7);line-height:1.6;margin-bottom:8px">디지털 악보 구매</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:16px">Noto Sans KR — Body</div>
+          <div style="font-family:'Courier New',monospace;font-size:13px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:6px;display:inline-block">20250419-004821</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px">JetBrains Mono — Order #</div>
+        </div>
+        <!-- Components -->
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px">
+          <div class="eyebrow" style="margin-bottom:16px;font-size:11px">Components</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button style="background:#F97316;color:#fff;border:none;border-radius:10px;padding:10px 0;font-size:14px;font-weight:700;cursor:default;font-family:inherit">구매하기</button>
+            <button style="background:#FBBF24;color:#92400E;border:none;border-radius:10px;padding:10px 0;font-size:14px;font-weight:700;cursor:default;font-family:inherit">💰 포인트 결제</button>
+            <button style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 0;font-size:14px;cursor:default;font-family:inherit">🛒 장바구니</button>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span style="background:#D1FAE5;color:#059669;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700">무료</span>
+              <span style="background:#FEE2E2;color:#DC2626;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700">TIME SALE</span>
+              <span style="background:#E0E7FF;color:#4F46E5;padding:3px 10px;border-radius:9999px;font-size:11px;font-weight:700">악보집</span>
+            </div>
+          </div>
+        </div>
+        <!-- Specs -->
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px">
+          <div class="eyebrow" style="margin-bottom:16px;font-size:11px">Tech Stack</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="feature-item"><div class="feature-dot"></div><span style="font-size:14px">Next.js 15 · App Router</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span style="font-size:14px">Tailwind CSS + shadcn/ui</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span style="font-size:14px">lucide-react (stroke 1.5)</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span style="font-size:14px">Radius: 8 / 12 / 16 / ∞ px</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span style="font-size:14px">shadow-sm → shadow-xl</span></div>
+            <div class="feature-item"><div class="feature-dot"></div><span style="font-size:14px">transition: 150ms ease-out</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</deck-stage>
+</body>
+</html>
