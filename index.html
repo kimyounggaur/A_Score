@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScoreStore — 디지털 악보 마켓</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Noto+Serif+KR:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+/* ============================================================
+   ScoreStore Design System — Colors & Typography
+   ============================================================ */
+
+@font-face {
+  font-family: 'MaruBuri';
+  src: url('fonts/MaruBuri-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --color-slate-50:   #F8FAFC;
+  --color-slate-100:  #F1F5F9;
+  --color-slate-200:  #E2E8F0;
+  --color-slate-300:  #CBD5E1;
+  --color-slate-400:  #94A3B8;
+  --color-slate-500:  #64748B;
+  --color-slate-600:  #475569;
+  --color-slate-700:  #334155;
+  --color-slate-800:  #1E293B;
+  --color-slate-900:  #0F172A;
+
+  --color-orange-50:  #FFF7ED;
+  --color-orange-100: #FFEDD5;
+  --color-orange-200: #FED7AA;
+  --color-orange-300: #FDBA74;
+  --color-orange-400: #FB923C;
+  --color-orange-500: #F97316;
+  --color-orange-600: #EA6A0A;
+  --color-orange-700: #C2560A;
+
+  --color-amber-100:  #FEF3C7;
+  --color-amber-200:  #FDE68A;
+  --color-amber-300:  #FCD34D;
+  --color-amber-400:  #FBBF24;
+  --color-amber-500:  #F59E0B;
+  --color-amber-600:  #D97706;
+  --color-kakao:      #FEE500;
+
+  --color-emerald-50:  #ECFDF5;
+  --color-emerald-100: #D1FAE5;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #059669;
+
+  --color-red-50:   #FEF2F2;
+  --color-red-100:  #FEE2E2;
+  --color-red-500:  #EF4444;
+  --color-red-600:  #DC2626;
+
+  --color-indigo-100: #E0E7FF;
+  --color-indigo-500: #6366F1;
+  --color-indigo-600: #4F46E5;
+
+  --bg-page:       var(--color-slate-50);
+  --bg-surface:    #FFFFFF;
+  --bg-muted:      var(--color-slate-100);
+  --bg-dark:       var(--color-slate-900);
+
+  --fg-primary:    var(--color-slate-900);
+  --fg-secondary:  var(--color-slate-600);
+  --fg-muted:      var(--color-slate-400);
+  --fg-on-dark:    #FFFFFF;
+  --fg-on-accent:  #FFFFFF;
+
+  --accent:         var(--color-orange-500);
+  --accent-hover:   var(--color-orange-600);
+  --accent-subtle:  var(--color-orange-50);
+
+  --point-bg:      var(--color-amber-100);
+  --point-text:    #92400E;
+  --point-accent:  var(--color-amber-500);
+
+  --success:       var(--color-emerald-500);
+  --success-subtle:var(--color-emerald-50);
+  --success-text:  var(--color-emerald-600);
+
+  --danger:        var(--color-red-500);
+  --danger-subtle: var(--color-red-50);
+  --danger-text:   var(--color-red-600);
+
+  --border:        var(--color-slate-200);
+  --border-focus:  var(--color-orange-400);
+
+  --font-sans-ko:    'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  --font-serif-ko:   'MaruBuri', 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
+  --font-mono:       'JetBrains Mono', 'Courier New', monospace;
+  --font-body:       var(--font-sans-ko);
+  --font-display:    var(--font-serif-ko);
+
+  --text-xs:   12px;
+  --text-sm:   14px;
+  --text-base: 16px;
+  --text-lg:   18px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  28px;
+  --text-4xl:  32px;
+  --text-5xl:  40px;
+  --text-6xl:  48px;
+
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-black:    900;
+
+  --leading-tight:   1.25;
+  --leading-snug:    1.375;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;
+
+  --tracking-tight:  -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.025em;
+
+  --space-0:   0px;
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-full: 9999px;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-lg:  0 10px 24px rgba(0,0,0,0.14), 0 4px 8px rgba(0,0,0,0.08);
+  --shadow-xl:  0 20px 48px rgba(0,0,0,0.18);
+  --shadow-up:  0 -4px 16px rgba(0,0,0,0.08);
+
+  --transition-fast:   150ms ease-out;
+  --transition-base:   200ms ease-out;
+  --transition-slow:   300ms ease-out;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-relaxed);
+  color: var(--fg-primary);
+  background-color: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+h1 { font-family: var(--font-display); font-size: var(--text-4xl); font-weight: var(--weight-bold); line-height: var(--leading-tight); }
+h2 { font-family: var(--font-display); font-size: var(--text-3xl); font-weight: var(--weight-bold); line-height: var(--leading-tight); }
+h3 { font-family: var(--font-sans-ko); font-size: var(--text-2xl); font-weight: var(--weight-semibold); }
+h4 { font-family: var(--font-sans-ko); font-size: var(--text-xl);  font-weight: var(--weight-semibold); }
+p  { font-size: var(--text-base); line-height: var(--leading-relaxed); color: var(--fg-primary); }
+small { font-size: var(--text-sm); color: var(--fg-secondary); }
+code  { font-family: var(--font-mono); font-size: var(--text-sm); background: var(--bg-muted); padding: 2px 6px; border-radius: 4px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 24px; border-radius: var(--radius-md);
+  font-family: var(--font-body); font-size: var(--text-base); font-weight: var(--weight-semibold);
+  border: none; cursor: pointer; text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap; user-select: none;
+}
+.btn:active { transform: scale(0.95); }
+.btn-primary   { background: var(--accent); color: var(--fg-on-accent); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--bg-surface); color: var(--fg-primary); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg-muted); }
+.btn-ghost     { background: transparent; color: var(--accent); }
+.btn-ghost:hover { background: var(--accent-subtle); }
+.btn-danger    { background: var(--danger); color: white; }
+.btn-point     { background: var(--color-amber-400); color: var(--color-slate-900); font-weight: var(--weight-bold); }
+.btn-sm { padding: 8px 16px; font-size: var(--text-sm); border-radius: var(--radius-sm); }
+.btn-lg { padding: 16px 32px; font-size: var(--text-lg); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 10px; border-radius: var(--radius-full);
+  font-size: var(--text-xs); font-weight: var(--weight-semibold);
+  white-space: nowrap; line-height: 1.6;
+}
+.badge-free    { background: var(--color-emerald-100); color: var(--color-emerald-600); }
+.badge-sale    { background: var(--color-red-100); color: var(--color-red-600); }
+.badge-bundle  { background: var(--color-indigo-100); color: var(--color-indigo-600); }
+.badge-new     { background: var(--color-slate-800); color: white; }
+.badge-point   { background: var(--color-amber-100); color: #92400E; }
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+@media (max-width: 768px) { .desktop-nav { display: none !important; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+/* ─── BottomTabBar ────────────────────────────────────────── */
+function BottomTabBar({ currentPage, onNavigate, cartCount = 2, notifCount = 3 }) {
+  const tabs = [
+    { key: 'home', label: '홈', icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    )},
+    { key: 'search', label: '검색', icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+    )},
+    { key: 'cart', label: '장바구니', badge: cartCount, icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      </svg>
+    )},
+    { key: 'notifications', label: '알림', badge: notifCount, icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    )},
+    { key: 'mypage', label: '마이', icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+    )},
+  ];
+
+  return (
+    <nav style={{
+      position: 'fixed', bottom: 0, left: 0, right: 0,
+      background: '#FFFFFF', borderTop: '1px solid #E2E8F0',
+      display: 'flex', zIndex: 40,
+      paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+    }}>
+      {tabs.map(tab => {
+        const active = currentPage === tab.key;
+        return (
+          <button key={tab.key} onClick={() => onNavigate(tab.key)} style={{
+            flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+            padding: '8px 0 10px', background: 'none', border: 'none', cursor: 'pointer',
+            color: active ? '#F97316' : '#94A3B8', position: 'relative',
+            fontFamily: 'inherit', transition: 'color 150ms'
+          }}>
+            <div style={{ position: 'relative' }}>
+              {tab.icon(active)}
+              {tab.badge > 0 && (
+                <span style={{
+                  position: 'absolute', top: -3, right: -5,
+                  background: '#EF4444', color: '#fff',
+                  borderRadius: '50%', width: 16, height: 16,
+                  fontSize: 10, fontWeight: 700,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: '1.5px solid white'
+                }}>{tab.badge}</span>
+              )}
+            </div>
+            <span style={{ fontSize: 10, fontWeight: active ? 600 : 500 }}>{tab.label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+function Header({ currentPage, onNavigate, cartCount = 2, notifCount = 3, pointBalance = 12300 }) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const navItems = [
+    { label: '기타', key: 'category-guitar' },
+    { label: '베이스', key: 'category-bass' },
+    { label: '드럼', key: 'category-drums' },
+    { label: '악보집', key: 'bundles' },
+    { label: '무료악보', key: 'free' },
+    { label: '포인트충전', key: 'points', accent: true },
+  ];
+
+  return (
+    <header style={{
+      background: '#FFFFFF',
+      borderBottom: '1px solid #E2E8F0',
+      position: 'sticky', top: 0, zIndex: 50,
+      boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+    }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', gap: 16 }}>
+        {/* Logo */}
+        <button onClick={() => onNavigate('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          <span style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 20, fontWeight: 300, color: '#F97316' }}>Score</span>
+          <span style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 20, fontWeight: 300, color: '#0F172A' }}>Store</span>
+          <span style={{ color: '#F97316', fontSize: 18, lineHeight: 1 }}>♪</span>
+        </button>
+
+        {/* Desktop Nav */}
+        <nav style={{ display: 'flex', gap: 4, flex: 1 }} className="desktop-nav">
+          {navItems.map(item => (
+            <button key={item.key} onClick={() => onNavigate(item.key)} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: '6px 10px', borderRadius: 8,
+              fontSize: 14, fontWeight: 500,
+              color: item.accent ? '#F97316' : currentPage === item.key ? '#F97316' : '#334155',
+              fontFamily: 'inherit', transition: 'background 150ms'
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
+            onMouseLeave={e => e.currentTarget.style.background = 'none'}
+            >{item.label}</button>
+          ))}
+        </nav>
+
+        {/* Right actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+          <div style={{ background: '#FEF3C7', color: '#92400E', borderRadius: 9999, padding: '4px 10px', fontSize: 12, fontWeight: 600, flexShrink: 0 }}>
+            💰 {pointBalance.toLocaleString()}P
+          </div>
+          <button onClick={() => setSearchOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, color: '#64748B', display: 'flex' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </button>
+          <button onClick={() => onNavigate('notifications')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, color: '#64748B', position: 'relative', display: 'flex' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            {notifCount > 0 && <span style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '1.5px solid white' }}></span>}
+          </button>
+          <button onClick={() => onNavigate('cart')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, color: '#64748B', position: 'relative', display: 'flex' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            {cartCount > 0 && <span style={{ position: 'absolute', top: 2, right: 2, background: '#F97316', color: '#fff', borderRadius: '50%', width: 16, height: 16, fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cartCount}</span>}
+          </button>
+          <button onClick={() => onNavigate('login')} style={{ background: '#F97316', color: '#fff', border: 'none', cursor: 'pointer', padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, fontFamily: 'inherit' }}>
+            로그인
+          </button>
+        </div>
+      </div>
+
+      {/* Search overlay */}
+      {searchOpen && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', zIndex: 100, display: 'flex', alignItems: 'flex-start', paddingTop: 80 }} onClick={() => setSearchOpen(false)}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: 600, margin: '0 auto', borderRadius: 16, padding: 20, boxShadow: '0 20px 48px rgba(0,0,0,0.18)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="곡명, 아티스트, 편곡자 검색..." style={{ flex: 1, border: 'none', outline: 'none', fontSize: 16, fontFamily: 'inherit', color: '#0F172A' }} />
+              <button onClick={() => setSearchOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', fontSize: 20 }}>✕</button>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', marginBottom: 8 }}>인기 검색어</div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {['한로로', '검정치마', 'AKMU', '아이유', '뉴진스'].map(t => (
+                  <span key={t} style={{ background: '#F1F5F9', color: '#334155', padding: '5px 12px', borderRadius: 9999, fontSize: 13, cursor: 'pointer' }} onClick={() => { setSearchQuery(t); }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
+
+/* ─── ScoreCard sub-components ───────────────────────────── */
+function DifficultyStars({ level = 3, size = 'sm' }) {
+  const sz = size === 'sm' ? 13 : size === 'md' ? 16 : 20;
+  return (
+    <span style={{ fontSize: sz, color: '#FBBF24', letterSpacing: 1 }} aria-label={`난이도 ${level}/5`} role="img">
+      {'★'.repeat(level)}{'☆'.repeat(5 - level)}
+    </span>
+  );
+}
+
+function Badge({ type, children }) {
+  const styles = {
+    free:   { background: '#D1FAE5', color: '#059669' },
+    sale:   { background: '#FEE2E2', color: '#DC2626' },
+    bundle: { background: '#E0E7FF', color: '#4F46E5' },
+    new:    { background: '#1E293B', color: '#fff' },
+  };
+  return (
+    <span style={{
+      ...styles[type],
+      padding: '2px 8px', borderRadius: 9999,
+      fontSize: 10, fontWeight: 700, whiteSpace: 'nowrap', lineHeight: 1.6
+    }}>{children}</span>
+  );
+}
+
+function PriceDisplay({ price, discountPrice, isFree, large }) {
+  const sz = large ? 20 : 15;
+  if (isFree) return <span style={{ fontSize: sz, fontWeight: 700, color: '#10B981' }}>무료</span>;
+  if (discountPrice) return (
+    <span style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'wrap' }}>
+      <span style={{ fontSize: 11, color: '#94A3B8', textDecoration: 'line-through' }}>₩{price.toLocaleString()}</span>
+      <span style={{ fontSize: sz, fontWeight: 700, color: '#EF4444' }}>₩{discountPrice.toLocaleString()}</span>
+    </span>
+  );
+  return <span style={{ fontSize: sz, fontWeight: 700, color: '#0F172A' }}>₩{price.toLocaleString()}</span>;
+}
+
+const THUMB_GRADIENTS = [
+  'linear-gradient(145deg,#1E293B,#334155)',
+  'linear-gradient(145deg,#7C3AED,#4F46E5)',
+  'linear-gradient(145deg,#065F46,#059669)',
+  'linear-gradient(145deg,#991B1B,#DC2626)',
+  'linear-gradient(145deg,#1E3A5F,#2563EB)',
+  'linear-gradient(145deg,#312E81,#6366F1)',
+];
+
+function ScoreCard({ score, onSelect, idx = 0 }) {
+  const [wished, setWished] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const grad = score.thumbGradient || THUMB_GRADIENTS[idx % THUMB_GRADIENTS.length];
+  const isBundle = score.type === 'bundle';
+
+  return (
+    <div onClick={() => onSelect && onSelect(score)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width: '100%', background: '#fff',
+        border: '1px solid #E2E8F0', borderRadius: 12, overflow: 'hidden',
+        cursor: 'pointer', transition: 'all 150ms ease-out',
+        boxShadow: hovered ? '0 4px 12px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.06)',
+        transform: hovered ? 'translateY(-2px)' : 'translateY(0)'
+      }}>
+      <div style={{ position: 'relative', background: grad, aspectRatio: isBundle ? '16/9' : '3/4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontSize: isBundle ? 36 : 48, opacity: 0.15 }}>{isBundle ? '📚' : '♪'}</span>
+        <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {score.isFree && <Badge type="free">무료</Badge>}
+          {score.isNew && <Badge type="new">NEW</Badge>}
+          {score.discountPrice && !score.isFree && <Badge type="sale">SALE</Badge>}
+          {isBundle && <Badge type="bundle">악보집</Badge>}
+        </div>
+        {!isBundle && (
+          <button onClick={e => { e.stopPropagation(); setWished(!wished); }} style={{
+            position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', cursor: 'pointer',
+            color: wished ? '#EF4444' : 'rgba(255,255,255,0.7)', fontSize: 18, lineHeight: 1
+          }}>{wished ? '♥' : '♡'}</button>
+        )}
+      </div>
+      <div style={{ padding: '10px 12px 14px' }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', lineHeight: 1.35, marginBottom: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          {score.title}
+        </div>
+        <div style={{ fontSize: 11, color: '#64748B', marginBottom: 6 }}>
+          {score.artist || score.subtitle}
+        </div>
+        {score.difficulty && <div style={{ marginBottom: 4 }}><DifficultyStars level={score.difficulty} /></div>}
+        <PriceDisplay price={score.price} discountPrice={score.discountPrice} isFree={score.isFree} />
+      </div>
+    </div>
+  );
+}
+
+/* ─── ScoreDetail ─────────────────────────────────────────── */
+function ScoreDetail({ score, onNavigate, onBack }) {
+  const [wished, setWished] = useState(false);
+  const pointBalance = 12300;
+  const canPayWithPoints = score && pointBalance >= (score.discountPrice || score.price || 0);
+
+  if (!score) return null;
+  const grad = score.thumbGradient || 'linear-gradient(145deg,#1E293B,#334155)';
+
+  return (
+    <div style={{ background: '#F8FAFC', minHeight: '100vh', paddingBottom: 96 }}>
+      <div style={{ background: grad, height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        <span style={{ fontSize: 80, opacity: 0.12 }}>♪</span>
+        <button onClick={onBack} style={{ position: 'absolute', top: 16, left: 16, background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', color: '#fff', borderRadius: 8, padding: '6px 10px', fontSize: 18, backdropFilter: 'blur(8px)' }}>←</button>
+        <div style={{ position: 'absolute', bottom: 16, left: 16, display: 'flex', gap: 6 }}>
+          {score.isFree && <span style={{ background: '#D1FAE5', color: '#059669', padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>무료</span>}
+          {score.discountPrice && <span style={{ background: '#FEE2E2', color: '#DC2626', padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>TIME SALE -17%</span>}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px' }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: '20px 20px 16px', marginTop: -24, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', position: 'relative', zIndex: 2 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', marginBottom: 4 }}>
+            {score.instrument} · {score.genre}
+          </div>
+          <h1 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 22, fontWeight: 300, lineHeight: 1.3, color: '#0F172A', marginBottom: 4 }}>{score.title}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <span style={{ fontSize: 18, color: '#FBBF24', letterSpacing: 2 }}>
+              {'★'.repeat(score.difficulty || 3)}{'☆'.repeat(5 - (score.difficulty || 3))}
+            </span>
+            <span style={{ fontSize: 12, color: '#94A3B8' }}>/</span>
+            <span style={{ fontSize: 17, color: '#334155', letterSpacing: 2 }}>
+              {'●'.repeat(score.technique || 2)}{'○'.repeat(5 - (score.technique || 2))}
+            </span>
+          </div>
+          <div style={{ fontSize: 13, color: '#64748B', marginBottom: 10 }}>아티스트: <strong style={{ color: '#334155' }}>{score.artist}</strong> · 편곡: <strong style={{ color: '#334155' }}>{score.arranger || '김민수'}</strong></div>
+
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            {score.discountPrice && <span style={{ fontSize: 14, color: '#94A3B8', textDecoration: 'line-through' }}>₩{score.price.toLocaleString()}</span>}
+            <span style={{ fontSize: 28, fontWeight: 700, color: score.isFree ? '#10B981' : '#0F172A' }}>
+              {score.isFree ? '무료' : `₩${(score.discountPrice || score.price).toLocaleString()}`}
+            </span>
+            {score.discountPrice && <span style={{ background: '#FEE2E2', color: '#DC2626', padding: '2px 8px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>-17%</span>}
+          </div>
+
+          {canPayWithPoints && (
+            <div style={{ background: '#FEF3C7', borderRadius: 8, padding: '8px 12px', marginTop: 10, fontSize: 12, color: '#92400E' }}>
+              💰 포인트로 구매 가능 — 보유 포인트: <strong>{pointBalance.toLocaleString()}P</strong>
+            </div>
+          )}
+        </div>
+
+        <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginTop: 12, display: 'flex', gap: 20, flexWrap: 'wrap', border: '1px solid #E2E8F0' }}>
+          {[
+            { label: '조성', value: score.key || 'G장조' },
+            { label: 'BPM', value: score.bpm || '88' },
+            { label: '페이지', value: `${score.pages || 4}p` },
+            { label: '형식', value: 'TAB + 표준' },
+          ].map(m => (
+            <div key={m.label} style={{ textAlign: 'center', flex: 1, minWidth: 56 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', marginBottom: 2 }}>{m.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{m.value}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginTop: 12, border: '1px solid #E2E8F0' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8 }}>🎵 미리듣기 (30초)</div>
+          <div style={{ background: '#F1F5F9', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button style={{ background: '#F97316', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '50%', width: 32, height: 32, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▶</button>
+            <div style={{ flex: 1, height: 3, background: '#E2E8F0', borderRadius: 2, position: 'relative' }}>
+              <div style={{ width: '30%', height: '100%', background: '#F97316', borderRadius: 2 }}></div>
+            </div>
+            <span style={{ fontSize: 11, color: '#64748B', flexShrink: 0 }}>0:09 / 0:30</span>
+          </div>
+        </div>
+
+        <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginTop: 12, border: '1px solid #E2E8F0' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8 }}>📄 샘플 미리보기 (1페이지)</div>
+          <div style={{ background: '#F8FAFC', borderRadius: 8, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #CBD5E1' }}>
+            <div style={{ textAlign: 'center', color: '#94A3B8' }}>
+              <div style={{ fontSize: 32, marginBottom: 4 }}>♩ ♩ ♩ ♩</div>
+              <div style={{ fontSize: 12 }}>워터마크 샘플 PDF (1p)</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ marginTop: 12, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {(score.tags || ['K-POP', '발라드', '통기타', '핑거스타일']).map(tag => (
+            <span key={tag} style={{ background: '#F1F5F9', color: '#475569', padding: '4px 12px', borderRadius: 9999, fontSize: 12 }}>#{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{
+        position: 'fixed', bottom: 56, left: 0, right: 0,
+        background: '#fff', padding: '12px 16px',
+        boxShadow: '0 -4px 16px rgba(0,0,0,0.08)',
+        display: 'flex', gap: 8, maxWidth: 640, margin: '0 auto',
+        zIndex: 30
+      }}>
+        <button onClick={() => setWished(!wished)} style={{
+          background: 'none', border: '1.5px solid #E2E8F0', borderRadius: 10,
+          padding: '0 16px', cursor: 'pointer', fontSize: 18,
+          color: wished ? '#EF4444' : '#94A3B8'
+        }}>{wished ? '♥' : '♡'}</button>
+
+        <button style={{
+          flex: 1, background: '#F1F5F9', color: '#334155', border: 'none',
+          borderRadius: 10, padding: '13px 0', cursor: 'pointer',
+          fontFamily: 'inherit', fontWeight: 600, fontSize: 14
+        }}>🛒 장바구니</button>
+
+        {canPayWithPoints ? (
+          <button onClick={() => onNavigate('checkout')} style={{
+            flex: 1.2, background: '#FBBF24', color: '#92400E', border: 'none',
+            borderRadius: 10, padding: '13px 0', cursor: 'pointer',
+            fontFamily: 'inherit', fontWeight: 700, fontSize: 14
+          }}>💰 포인트 결제</button>
+        ) : (
+          <button onClick={() => onNavigate('checkout')} style={{
+            flex: 1.2, background: '#F97316', color: '#fff', border: 'none',
+            borderRadius: 10, padding: '13px 0', cursor: 'pointer',
+            fontFamily: 'inherit', fontWeight: 700, fontSize: 14
+          }}>{score.isFree ? '🎁 무료 다운로드' : '💳 바로구매'}</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── PointCharge ─────────────────────────────────────────── */
+function PointCharge({ onNavigate }) {
+  const [selected, setSelected] = useState(1);
+  const [payMethod, setPayMethod] = useState('card');
+  const balance = 12300;
+
+  const packages = [
+    { id: 0, amount: 10000, bonus: 0 },
+    { id: 1, amount: 30000, bonus: 3000 },
+    { id: 2, amount: 50000, bonus: 7500, hot: true },
+    { id: 3, amount: 100000, bonus: 20000, hot: true },
+  ];
+
+  const pkg = packages[selected];
+  const total = pkg.amount + pkg.bonus;
+
+  return (
+    <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 100px', background: '#F8FAFC', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <button onClick={() => onNavigate('mypage')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', fontSize: 20, padding: 4 }}>←</button>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>포인트 충전</h2>
+      </div>
+
+      <div style={{ background: 'linear-gradient(135deg,#0F172A,#1E293B)', borderRadius: 16, padding: '20px 24px', marginBottom: 20, color: '#fff' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.06em', marginBottom: 4 }}>보유 포인트</div>
+        <div style={{ fontSize: 36, fontWeight: 700, color: '#FBBF24', marginBottom: 2 }}>{balance.toLocaleString()} P</div>
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>유효기간: 2027.04.18까지</div>
+      </div>
+
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', marginBottom: 10 }}>충전 패키지 선택</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+        {packages.map(p => {
+          const pct = Math.round((p.bonus / p.amount) * 100);
+          const isSelected = selected === p.id;
+          return (
+            <button key={p.id} onClick={() => setSelected(p.id)} style={{
+              background: isSelected ? '#FFF7ED' : '#fff',
+              border: `2px solid ${isSelected ? '#F97316' : '#E2E8F0'}`,
+              borderRadius: 12, padding: '14px 12px', cursor: 'pointer', textAlign: 'center',
+              fontFamily: 'inherit', transition: 'all 150ms', position: 'relative', overflow: 'hidden'
+            }}>
+              {p.hot && <div style={{ position: 'absolute', top: 0, right: 0, background: '#EF4444', color: '#fff', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: '0 10px 0 8px' }}>🔥 BEST</div>}
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginBottom: 3 }}>{p.amount.toLocaleString()}P</div>
+              <div style={{ fontSize: 13, color: '#64748B', marginBottom: pct > 0 ? 4 : 0 }}>₩{p.amount.toLocaleString()}</div>
+              {pct > 0
+                ? <div style={{ fontSize: 11, fontWeight: 700, color: '#F97316' }}>+{p.bonus.toLocaleString()}P 보너스 ({pct}% 🎁)</div>
+                : <div style={{ fontSize: 11, color: '#CBD5E1' }}>보너스 없음</div>}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', marginBottom: 16, border: '1px solid #E2E8F0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14, color: '#64748B' }}>
+          <span>결제 금액</span><span style={{ fontWeight: 600, color: '#0F172A' }}>₩{pkg.amount.toLocaleString()}</span>
+        </div>
+        {pkg.bonus > 0 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14, color: '#F97316' }}>
+            <span>보너스 포인트</span><span style={{ fontWeight: 600 }}>+{pkg.bonus.toLocaleString()}P</span>
+          </div>
+        )}
+        <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 16, fontWeight: 700, color: '#0F172A' }}>
+          <span>충전 후 잔액</span><span style={{ color: '#FBBF24' }}>{(balance + total).toLocaleString()}P</span>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', marginBottom: 10 }}>결제 수단</div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        {[
+          { id: 'card', label: '💳 카드' },
+          { id: 'kakao', label: '🟡 카카오페이' },
+          { id: 'naver', label: '🟢 네이버페이' },
+        ].map(m => (
+          <button key={m.id} onClick={() => setPayMethod(m.id)} style={{
+            flex: 1, padding: '10px 0', border: `2px solid ${payMethod === m.id ? '#F97316' : '#E2E8F0'}`,
+            borderRadius: 10, background: payMethod === m.id ? '#FFF7ED' : '#fff',
+            cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 500,
+            color: '#334155', transition: 'all 150ms'
+          }}>{m.label}</button>
+        ))}
+      </div>
+
+      <button style={{
+        width: '100%', background: '#F97316', color: '#fff', border: 'none',
+        borderRadius: 12, padding: '16px 0', fontSize: 16, fontWeight: 700,
+        cursor: 'pointer', fontFamily: 'inherit'
+      }}>
+        ₩{pkg.amount.toLocaleString()} 충전하기
+      </button>
+      <p style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center', marginTop: 10, lineHeight: 1.6 }}>
+        포인트는 충전일로부터 1년간 유효하며, 현금 환불이 불가합니다.
+      </p>
+    </div>
+  );
+}
+
+/* ─── Sample Data ─────────────────────────────────────────── */
+const SCORES = [
+  { id: 1, title: '기타) 한로로 - 사랑하게 될거야', artist: '한로로', instrument: '통기타', genre: 'K-POP', difficulty: 2, technique: 2, price: 2400, isNew: true, tags: ['K-POP', '발라드', '통기타'] },
+  { id: 2, title: '베이스) 검정치마 - Antifreeze', artist: '검정치마', instrument: '베이스기타', genre: '인디', difficulty: 3, technique: 3, price: 2900, discountPrice: 1990, tags: ['인디', '베이스', '모던록'] },
+  { id: 3, title: '[무료] 임형주 - 천 개의 바람이 되어', artist: '임형주', instrument: '통기타', genre: '클래식', difficulty: 1, technique: 1, price: 0, isFree: true, tags: ['클래식', '무료', '통기타'] },
+  { id: 4, title: '기타) AKMU - 소문의 낙원', artist: 'AKMU', instrument: '일렉기타', genre: 'K-POP', difficulty: 3, technique: 2, price: 2400, thumbGradient: 'linear-gradient(145deg,#1E3A5F,#2563EB)', tags: ['K-POP', '일렉기타'] },
+  { id: 5, title: '드럼) 뉴진스 - Hype Boy', artist: '뉴진스', instrument: '드럼', genre: 'K-POP', difficulty: 2, technique: 2, price: 2900, isNew: true, thumbGradient: 'linear-gradient(145deg,#831843,#BE185D)', tags: ['K-POP', '드럼'] },
+  { id: 6, title: '기타) 아이유 - 밤편지', artist: '아이유', instrument: '통기타', genre: 'K-POP', difficulty: 2, technique: 1, price: 2400, thumbGradient: 'linear-gradient(145deg,#78350F,#D97706)', tags: ['K-POP', '발라드'] },
+  { id: 7, title: '피아노) 쇼팽 - 야상곡 Op.9 No.2', artist: '쇼팽', instrument: '피아노', genre: '클래식', difficulty: 4, technique: 5, price: 2900, thumbGradient: 'linear-gradient(145deg,#1E293B,#475569)', tags: ['클래식', '피아노'] },
+  { id: 8, title: '기타) 빌리 - Ring x Ring', artist: '빌리', instrument: '통기타', genre: 'K-POP', difficulty: 2, technique: 2, price: 2400, discountPrice: 1900, isNew: true, thumbGradient: 'linear-gradient(145deg,#312E81,#6D28D9)', tags: ['K-POP', '통기타'] },
+];
+
+const BUNDLES = [
+  { id: 'b1', type: 'bundle', title: '통기타 SEASON2 악보집', subtitle: '10곡 수록', price: 24000, discountPrice: 18000, thumbGradient: 'linear-gradient(145deg,#1E3A5F,#6366F1)' },
+  { id: 'b2', type: 'bundle', title: '통기타 SEASON1 악보집', subtitle: '5곡 수록', price: 12000, discountPrice: 9000, thumbGradient: 'linear-gradient(145deg,#065F46,#0D9488)' },
+];
+
+const INSTRUMENTS = [
+  { label: '통기타', emoji: '🎸' }, { label: '일렉기타', emoji: '⚡' },
+  { label: '베이스', emoji: '🎸' }, { label: '드럼', emoji: '🥁' },
+  { label: '피아노', emoji: '🎹' }, { label: '우쿨렐레', emoji: '🪕' },
+  { label: '무료', emoji: '🎁' },
+];
+
+/* ─── HomePage ────────────────────────────────────────────── */
+function Section({ title, children, onMore }) {
+  return (
+    <div style={{ marginTop: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 18, fontWeight: 300, color: '#0F172A' }}>{title}</h2>
+        <button onClick={onMore} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#94A3B8', fontFamily: 'inherit' }}>더보기 →</button>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function ScoreGrid({ scores, onSelect }) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+      {scores.map((s, i) => <ScoreCard key={s.id} score={s} idx={i} onSelect={onSelect} />)}
+    </div>
+  );
+}
+
+function HomePage({ onSelectScore }) {
+  const [bannerIdx, setBannerIdx] = useState(0);
+  const banners = [
+    { bg: 'linear-gradient(135deg,#0F172A 0%,#1E3A5F 100%)', title: '이달의 신곡 업데이트', sub: '매주 새로운 악보 추가', cta: '신곡 보기' },
+    { bg: 'linear-gradient(135deg,#7C3AED 0%,#4F46E5 100%)', title: '통기타 SEASON2 악보집', sub: '10곡 수록 · ₩18,000', cta: '악보집 보기' },
+    { bg: 'linear-gradient(135deg,#065F46 0%,#059669 100%)', title: '🎁 무료악보 이벤트', sub: '회원가입 시 악보 1곡 무료', cta: '무료악보 받기' },
+  ];
+
+  useEffect(() => {
+    const t = setInterval(() => setBannerIdx(i => (i + 1) % banners.length), 4000);
+    return () => clearInterval(t);
+  }, []);
+
+  const b = banners[bannerIdx];
+
+  return (
+    <div style={{ paddingBottom: 80 }}>
+      {/* Hero Banner */}
+      <div style={{ background: b.bg, padding: '40px 20px', textAlign: 'center', minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', transition: 'background 600ms ease', position: 'relative' }}>
+        <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 24, fontWeight: 300, color: '#fff', marginBottom: 6 }}>{b.title}</h2>
+        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 16 }}>{b.sub}</p>
+        <button style={{ background: '#F97316', color: '#fff', border: 'none', borderRadius: 9999, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{b.cta}</button>
+        <div style={{ display: 'flex', gap: 6, marginTop: 16 }}>
+          {banners.map((_, i) => <div key={i} style={{ width: i === bannerIdx ? 20 : 6, height: 6, borderRadius: 3, background: i === bannerIdx ? '#F97316' : 'rgba(255,255,255,0.4)', transition: 'all 300ms' }} />)}
+        </div>
+      </div>
+
+      {/* Instrument filter strip */}
+      <div style={{ background: '#fff', padding: '16px 0', borderBottom: '1px solid #E2E8F0', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: 0, minWidth: 'max-content', padding: '0 16px' }}>
+          {INSTRUMENTS.map(inst => (
+            <button key={inst.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 14px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+              <span style={{ fontSize: 26 }}>{inst.emoji}</span>
+              <span style={{ fontSize: 11, fontWeight: 500, color: '#475569', whiteSpace: 'nowrap' }}>{inst.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px' }}>
+        <Section title="🎁 무료 악보" onMore={() => {}}>
+          <ScoreGrid scores={SCORES.filter(s => s.isFree)} onSelect={onSelectScore} />
+        </Section>
+
+        <Section title="🆕 신곡" onMore={() => {}}>
+          <ScoreGrid scores={SCORES.filter(s => s.isNew)} onSelect={onSelectScore} />
+        </Section>
+
+        <Section title="🔥 인기곡 TOP 20" onMore={() => {}}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {SCORES.slice(0, 5).map((s, i) => (
+              <button key={s.id} onClick={() => onSelectScore(s)} style={{
+                display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0',
+                background: 'none', border: 'none', cursor: 'pointer',
+                textAlign: 'left', width: '100%', fontFamily: 'inherit',
+                borderBottom: i < 4 ? '1px solid #F1F5F9' : 'none'
+              }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: i < 3 ? '#F97316' : '#94A3B8', width: 24, flexShrink: 0 }}>{i + 1}</span>
+                <div style={{ width: 40, height: 40, borderRadius: 8, background: s.thumbGradient || 'linear-gradient(145deg,#1E293B,#334155)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 16 }}>♪</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.title}</div>
+                  <div style={{ fontSize: 11, color: '#64748B' }}>{s.artist}</div>
+                </div>
+                <PriceDisplay price={s.price} discountPrice={s.discountPrice} isFree={s.isFree} />
+              </button>
+            ))}
+          </div>
+        </Section>
+
+        <Section title="📚 악보집" onMore={() => {}}>
+          <ScoreGrid scores={BUNDLES} onSelect={onSelectScore} />
+        </Section>
+      </div>
+
+      {/* Kakao floating chat button */}
+      <button style={{
+        position: 'fixed', bottom: 76, right: 16, zIndex: 50,
+        background: '#FEE500', border: 'none', borderRadius: '50%',
+        width: 52, height: 52, cursor: 'pointer', fontSize: 22,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>💬</button>
+    </div>
+  );
+}
+
+/* ─── CheckoutPage ────────────────────────────────────────── */
+function CheckoutPage({ score, onNavigate }) {
+  const [pointsUsed, setPointsUsed] = useState(0);
+  const balance = 12300;
+  const price = score ? (score.discountPrice || score.price || 0) : 2400;
+  const remain = Math.max(0, price - pointsUsed);
+
+  return (
+    <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 100px', background: '#F8FAFC', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <button onClick={() => onNavigate('detail')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', fontSize: 20, padding: 4 }}>←</button>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>결제하기</h2>
+      </div>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', marginBottom: 12, border: '1px solid #E2E8F0' }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8 }}>주문 상품</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>{score?.title || '기타) 한로로 - 사랑하게 될거야'}</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', marginTop: 6 }}>₩{price.toLocaleString()}</div>
+      </div>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', marginBottom: 12, border: '1px solid #E2E8F0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8' }}>포인트 사용</div>
+          <span style={{ fontSize: 12, color: '#64748B' }}>보유: {balance.toLocaleString()}P</span>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input type="number" value={pointsUsed} onChange={e => setPointsUsed(Math.min(balance, Math.max(0, Number(e.target.value))))}
+            style={{ flex: 1, border: '1.5px solid #E2E8F0', borderRadius: 8, padding: '8px 12px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+          <button onClick={() => setPointsUsed(Math.min(balance, price))} style={{ background: '#FFF7ED', color: '#F97316', border: '1.5px solid #F97316', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, fontSize: 13 }}>전액사용</button>
+        </div>
+      </div>
+      <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', marginBottom: 20, border: '1px solid #E2E8F0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#64748B', marginBottom: 6 }}><span>상품 금액</span><span>₩{price.toLocaleString()}</span></div>
+        {pointsUsed > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#F97316', marginBottom: 6 }}><span>포인트 할인</span><span>-{pointsUsed.toLocaleString()}P</span></div>}
+        <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 700, color: '#0F172A' }}><span>결제 금액</span><span>₩{remain.toLocaleString()}</span></div>
+      </div>
+      <button onClick={() => onNavigate('complete')} style={{ width: '100%', background: remain === 0 ? '#FBBF24' : '#F97316', color: remain === 0 ? '#92400E' : '#fff', border: 'none', borderRadius: 12, padding: '16px 0', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+        {remain === 0 ? '💰 포인트 결제' : `₩${remain.toLocaleString()} 결제하기`}
+      </button>
+    </div>
+  );
+}
+
+/* ─── CompletePage ────────────────────────────────────────── */
+function CompletePage({ onNavigate }) {
+  return (
+    <div style={{ maxWidth: 480, margin: '0 auto', padding: '60px 24px', textAlign: 'center', background: '#F8FAFC', minHeight: '100vh' }}>
+      <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
+      <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 24, fontWeight: 300, color: '#0F172A', marginBottom: 8 }}>결제 완료!</h2>
+      <p style={{ fontSize: 14, color: '#64748B', marginBottom: 4 }}>기타) 한로로 - 사랑하게 될거야</p>
+      <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 24 }}>주문번호: <span style={{ fontFamily: 'monospace' }}>20250419-004821</span></p>
+      <div style={{ background: '#FEF3C7', borderRadius: 12, padding: '14px 20px', marginBottom: 24, fontSize: 14, color: '#92400E', fontWeight: 600 }}>
+        +72P 포인트 적립 완료!
+      </div>
+      <button style={{ width: '100%', background: '#F97316', color: '#fff', border: 'none', borderRadius: 12, padding: '14px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10 }}>
+        📄 악보 다운로드
+      </button>
+      <button onClick={() => onNavigate('home')} style={{ width: '100%', background: '#fff', color: '#64748B', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 0', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+        홈으로 돌아가기
+      </button>
+    </div>
+  );
+}
+
+/* ─── Placeholder pages ───────────────────────────────────── */
+const PAGE_LABELS = {
+  cart: '장바구니', mypage: '마이페이지', login: '로그인',
+  notifications: '알림 센터', search: '검색', bundles: '악보집',
+  free: '무료 악보',
+};
+
+function PlaceholderPage({ page, onNavigate }) {
+  const label = PAGE_LABELS[page] || '카테고리';
+  return (
+    <div style={{ maxWidth: 480, margin: '0 auto', padding: '60px 24px', textAlign: 'center' }}>
+      <div style={{ fontSize: 48, marginBottom: 16 }}>🎵</div>
+      <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 22, fontWeight: 300, color: '#0F172A', marginBottom: 8 }}>{label}</h2>
+      <p style={{ fontSize: 14, color: '#94A3B8', marginBottom: 24 }}>UI 킷 프리뷰 — 이 화면은 추가 개발 예정입니다</p>
+      <button onClick={() => onNavigate('home')} style={{ background: '#F97316', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>← 홈으로</button>
+    </div>
+  );
+}
+
+/* ─── Root App ────────────────────────────────────────────── */
+const PLACEHOLDER_PAGES = new Set(['search','cart','notifications','mypage','bundles','free','login','category-guitar','category-bass','category-drums']);
+
+function App() {
+  const [page, setPage] = useState(() => localStorage.getItem('ss_page') || 'home');
+  const [selectedScore, setSelectedScore] = useState(null);
+
+  const navigate = (p) => {
+    setPage(p);
+    localStorage.setItem('ss_page', p);
+    window.scrollTo(0, 0);
+  };
+
+  useEffect(() => { window.__ssNavigate = navigate; }, []);
+
+  const handleSelectScore = (score) => {
+    setSelectedScore(score);
+    navigate('detail');
+  };
+
+  const isMobile = window.innerWidth < 768;
+  const hideChrome = page === 'complete' || page === 'checkout';
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
+      {!hideChrome && <Header currentPage={page} onNavigate={navigate} />}
+
+      <div style={{ paddingBottom: isMobile ? 72 : 0 }}>
+        {page === 'home'     && <HomePage onSelectScore={handleSelectScore} />}
+        {page === 'detail'   && <ScoreDetail score={selectedScore || SCORES[0]} onNavigate={navigate} onBack={() => navigate('home')} />}
+        {page === 'points'   && <PointCharge onNavigate={navigate} />}
+        {page === 'checkout' && <CheckoutPage score={selectedScore} onNavigate={navigate} />}
+        {page === 'complete' && <CompletePage onNavigate={navigate} />}
+        {PLACEHOLDER_PAGES.has(page) && <PlaceholderPage page={page} onNavigate={navigate} />}
+      </div>
+
+      {isMobile && !hideChrome && (
+        <BottomTabBar currentPage={page} onNavigate={navigate} />
+      )}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
