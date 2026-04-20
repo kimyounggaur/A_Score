@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScoreStore — 관리자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Noto+Serif+KR:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<style>
+/* ============================================================
+   ScoreStore Design System — Admin
+   ============================================================ */
+:root {
+  --color-slate-50:   #F8FAFC;
+  --color-slate-100:  #F1F5F9;
+  --color-slate-200:  #E2E8F0;
+  --color-slate-300:  #CBD5E1;
+  --color-slate-400:  #94A3B8;
+  --color-slate-500:  #64748B;
+  --color-slate-600:  #475569;
+  --color-slate-700:  #334155;
+  --color-slate-800:  #1E293B;
+  --color-slate-900:  #0F172A;
+
+  --color-orange-50:  #FFF7ED;
+  --color-orange-100: #FFEDD5;
+  --color-orange-400: #FB923C;
+  --color-orange-500: #F97316;
+  --color-orange-600: #EA6A0A;
+
+  --color-amber-100:  #FEF3C7;
+  --color-amber-400:  #FBBF24;
+  --color-amber-500:  #F59E0B;
+
+  --color-emerald-50:  #ECFDF5;
+  --color-emerald-100: #D1FAE5;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #059669;
+
+  --color-red-50:   #FEF2F2;
+  --color-red-100:  #FEE2E2;
+  --color-red-500:  #EF4444;
+  --color-red-600:  #DC2626;
+
+  --color-indigo-100: #E0E7FF;
+  --color-indigo-500: #6366F1;
+  --color-indigo-600: #4F46E5;
+
+  --color-sky-100: #E0F2FE;
+  --color-sky-500: #0EA5E9;
+  --color-sky-600: #0284C7;
+
+  --bg-page:       var(--color-slate-50);
+  --bg-surface:    #FFFFFF;
+  --bg-muted:      var(--color-slate-100);
+  --bg-dark:       var(--color-slate-900);
+  --bg-sidebar:    var(--color-slate-800);
+
+  --fg-primary:    var(--color-slate-900);
+  --fg-secondary:  var(--color-slate-600);
+  --fg-muted:      var(--color-slate-400);
+  --fg-on-dark:    #FFFFFF;
+  --fg-on-accent:  #FFFFFF;
+
+  --accent:        var(--color-orange-500);
+  --accent-hover:  var(--color-orange-600);
+  --accent-subtle: var(--color-orange-50);
+
+  --border:        var(--color-slate-200);
+  --border-focus:  var(--color-orange-400);
+
+  --success:       var(--color-emerald-500);
+  --danger:        var(--color-red-500);
+
+  --font-sans-ko:  'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  --font-mono:     'JetBrains Mono', 'Courier New', monospace;
+
+  --text-xs:   12px;
+  --text-sm:   14px;
+  --text-base: 16px;
+  --text-lg:   18px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  28px;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-full: 9999px;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-lg:  0 10px 24px rgba(0,0,0,0.14), 0 4px 8px rgba(0,0,0,0.08);
+
+  --transition-fast: 150ms ease-out;
+  --transition-base: 200ms ease-out;
+
+  --sidebar-w: 240px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans-ko);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: 1.5;
+  color: var(--fg-primary);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 20px; border-radius: var(--radius-md);
+  font-family: var(--font-sans-ko); font-size: var(--text-sm); font-weight: var(--weight-semibold);
+  border: none; cursor: pointer; text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap; user-select: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary   { background: var(--accent); color: white; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--bg-surface); color: var(--fg-primary); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg-muted); }
+.btn-danger    { background: var(--danger); color: white; }
+.btn-danger:hover { background: var(--color-red-600); }
+.btn-ghost     { background: transparent; color: var(--fg-secondary); }
+.btn-ghost:hover { background: var(--bg-muted); }
+.btn-sm { padding: 6px 12px; font-size: var(--text-xs); border-radius: var(--radius-sm); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 10px; border-radius: var(--radius-full);
+  font-size: var(--text-xs); font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+.badge-success  { background: var(--color-emerald-100); color: var(--color-emerald-600); }
+.badge-danger   { background: var(--color-red-100);     color: var(--color-red-600); }
+.badge-warning  { background: var(--color-amber-100);   color: #92400E; }
+.badge-info     { background: var(--color-indigo-100);  color: var(--color-indigo-600); }
+.badge-sky      { background: var(--color-sky-100);     color: var(--color-sky-600); }
+.badge-muted    { background: var(--color-slate-100);   color: var(--color-slate-600); }
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Form ── */
+.input {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: var(--font-sans-ko); font-size: var(--text-sm); color: var(--fg-primary);
+  background: var(--bg-surface); outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(249,115,22,0.12); }
+.input::placeholder { color: var(--fg-muted); }
+
+select.input { cursor: pointer; }
+
+/* ── Table ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+th {
+  text-align: left; padding: 10px 16px;
+  font-size: var(--text-xs); font-weight: var(--weight-semibold);
+  color: var(--fg-muted); letter-spacing: 0.05em; text-transform: uppercase;
+  background: var(--bg-muted); border-bottom: 1px solid var(--border);
+}
+td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--color-slate-50); }
+
+/* ── Login ── */
+.login-wrap {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-700) 100%);
+}
+.login-card {
+  width: 100%; max-width: 400px; padding: 48px 40px;
+  background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+}
+.login-logo { font-size: var(--text-2xl); font-weight: var(--weight-bold); color: var(--accent); margin-bottom: 4px; }
+.login-sub  { font-size: var(--text-sm); color: var(--fg-secondary); margin-bottom: 32px; }
+
+/* ── Layout ── */
+.admin-layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--bg-sidebar);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; height: 100vh;
+  z-index: 100; transition: transform var(--transition-base);
+}
+.sidebar-logo {
+  padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo-title {
+  font-size: var(--text-lg); font-weight: var(--weight-bold); color: white; margin-bottom: 2px;
+}
+.sidebar-logo-sub { font-size: var(--text-xs); color: var(--color-slate-400); }
+
+.sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+
+.nav-section-label {
+  padding: 6px 20px 4px;
+  font-size: 10px; font-weight: var(--weight-semibold);
+  color: var(--color-slate-500); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px; cursor: pointer;
+  font-size: var(--text-sm); color: var(--color-slate-300);
+  transition: all var(--transition-fast);
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); color: white; }
+.nav-item.active {
+  background: rgba(249,115,22,0.15); color: var(--color-orange-400);
+  border-left-color: var(--color-orange-400);
+}
+.nav-item svg { flex-shrink: 0; opacity: 0.8; }
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-footer {
+  padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-admin-info {
+  display: flex; align-items: center; gap: 10px;
+}
+.admin-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  font-size: var(--text-sm); font-weight: var(--weight-bold); color: white;
+}
+.admin-name  { font-size: var(--text-sm); font-weight: var(--weight-semibold); color: white; }
+.admin-role  { font-size: var(--text-xs); color: var(--color-slate-400); }
+
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1; min-width: 0;
+}
+
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 60px;
+  background: white; border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.topbar-title { font-size: var(--text-lg); font-weight: var(--weight-semibold); }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+.page-body { padding: 32px; }
+
+/* ── KPI Cards ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px; margin-bottom: 32px;
+}
+.kpi-card {
+  padding: 24px; border-radius: var(--radius-md);
+  background: white; border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+}
+.kpi-label  { font-size: var(--text-xs); font-weight: var(--weight-semibold); color: var(--fg-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+.kpi-value  { font-size: var(--text-3xl); font-weight: var(--weight-bold); color: var(--fg-primary); margin-bottom: 6px; line-height: 1.1; }
+.kpi-trend  { font-size: var(--text-xs); display: flex; align-items: center; gap: 4px; }
+.kpi-icon   { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+
+/* ── Section header ── */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.section-title { font-size: var(--text-xl); font-weight: var(--weight-semibold); }
+
+/* ── Tabs ── */
+.tab-list {
+  display: flex; gap: 4px; padding: 4px;
+  background: var(--bg-muted); border-radius: var(--radius-md);
+  width: fit-content; margin-bottom: 24px;
+}
+.tab-item {
+  padding: 7px 18px; border-radius: var(--radius-sm); cursor: pointer;
+  font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--fg-secondary);
+  transition: all var(--transition-fast); white-space: nowrap;
+}
+.tab-item:hover { color: var(--fg-primary); }
+.tab-item.active { background: white; color: var(--fg-primary); box-shadow: var(--shadow-sm); font-weight: var(--weight-semibold); }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 24px;
+}
+.modal {
+  background: white; border-radius: var(--radius-lg);
+  width: 100%; max-width: 520px;
+  box-shadow: var(--shadow-lg);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: var(--text-lg); font-weight: var(--weight-semibold); }
+.modal-body  { padding: 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ── Form groups ── */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: 6px; color: var(--fg-primary); }
+.form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── Toast ── */
+.toast-wrap {
+  position: fixed; top: 20px; right: 20px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+}
+.toast {
+  padding: 12px 20px; border-radius: var(--radius-md);
+  font-size: var(--text-sm); font-weight: var(--weight-medium);
+  color: white; box-shadow: var(--shadow-lg);
+  animation: slideIn 0.2s ease-out;
+}
+.toast-success { background: var(--color-emerald-600); }
+.toast-error   { background: var(--color-red-600); }
+.toast-info    { background: var(--color-indigo-600); }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Search bar ── */
+.search-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.search-input-wrap { position: relative; flex: 1; max-width: 320px; }
+.search-icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--fg-muted); pointer-events: none;
+}
+.search-input-wrap .input { padding-left: 38px; }
+
+/* ── Stats chart placeholder ── */
+.chart-bar-wrap { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding: 0 4px; }
+.chart-bar-col  { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+.chart-bar      { width: 100%; border-radius: 4px 4px 0 0; transition: opacity var(--transition-fast); min-height: 4px; }
+.chart-bar:hover { opacity: 0.8; }
+.chart-bar-label { font-size: 10px; color: var(--fg-muted); white-space: nowrap; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-240px); }
+  .sidebar.open { transform: translateX(0); width: 240px; }
+  .main-content { margin-left: 0; }
+  .page-body { padding: 20px; }
+  .form-row { grid-template-columns: 1fr; }
+  .mobile-menu-btn { display: flex !important; }
+}
+
+.mobile-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 6px; border-radius: var(--radius-sm); }
+.mobile-menu-btn:hover { background: var(--bg-muted); }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--fg-muted);
+}
+.empty-state svg { margin: 0 auto 16px; display: block; opacity: 0.4; }
+.empty-state p { font-size: var(--text-sm); }
+
+/* ── Settings ── */
+.settings-section { margin-bottom: 32px; }
+.settings-section-title { font-size: var(--text-base); font-weight: var(--weight-semibold); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-label { font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.settings-desc  { font-size: var(--text-xs); color: var(--fg-muted); margin-top: 2px; }
+
+/* ── Toggle ── */
+.toggle-wrap { position: relative; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; }
+.toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0; background: var(--color-slate-300);
+  border-radius: var(--radius-full); transition: background var(--transition-fast);
+}
+.toggle-wrap input:checked + .toggle-track { background: var(--accent); }
+.toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; background: white; border-radius: 50%;
+  box-shadow: var(--shadow-sm); transition: transform var(--transition-fast);
+}
+.toggle-wrap input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+/* ── Activity feed ── */
+.activity-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px;
+}
+.activity-text { font-size: var(--text-sm); line-height: 1.5; }
+.activity-time { font-size: var(--text-xs); color: var(--fg-muted); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ════════════════════════════════════════════════════════════
+   MOCK DATA
+   ════════════════════════════════════════════════════════════ */
+const MOCK_SCORES = [
+  { id: 1, title: '봄날 피아노 편곡', artist: '아이유', instrument: '피아노', genre: '발라드', price: 3500, free: false, status: 'active', downloads: 342, date: '2025-03-12' },
+  { id: 2, title: '사랑이 뭐길래 기타 TAB', artist: '조용필', instrument: '기타', genre: '트로트', price: 0, free: true, status: 'active', downloads: 1204, date: '2025-02-28' },
+  { id: 3, title: 'Dynamite 드럼 악보', artist: 'BTS', instrument: '드럼', genre: 'K-POP', price: 4200, free: false, status: 'active', downloads: 890, date: '2025-03-20' },
+  { id: 4, title: '첫눈처럼 너에게 가겠다 바이올린', artist: '에일리', instrument: '바이올린', genre: '발라드', price: 2800, free: false, status: 'pending', downloads: 0, date: '2025-04-01' },
+  { id: 5, title: 'Celebrity 전체 편곡', artist: '아이유', instrument: '피아노+현악', genre: '팝', price: 6500, free: false, status: 'active', downloads: 567, date: '2025-01-15' },
+  { id: 6, title: 'Love Dive 베이스 TAB', artist: 'IVE', instrument: '베이스', genre: 'K-POP', price: 3000, free: false, status: 'inactive', downloads: 123, date: '2024-12-05' },
+  { id: 7, title: '어사용 민요 가야금', artist: '전통음악', instrument: '가야금', genre: '국악', price: 1500, free: false, status: 'active', downloads: 88, date: '2025-03-30' },
+  { id: 8, title: 'Supernova 풀밴드 스코어', artist: 'aespa', instrument: '풀밴드', genre: 'K-POP', price: 8900, free: false, status: 'active', downloads: 410, date: '2025-04-10' },
+];
+
+const MOCK_ORDERS = [
+  { id: 'ORD-2025-0841', user: '김민준', email: 'minjun@email.com', score: '봄날 피아노 편곡', amount: 3500, status: 'completed', date: '2025-04-18 14:32' },
+  { id: 'ORD-2025-0840', user: '이서연', email: 'seoyeon@email.com', score: 'Dynamite 드럼 악보', amount: 4200, status: 'completed', date: '2025-04-18 11:05' },
+  { id: 'ORD-2025-0839', user: '박지호', email: 'jiho@email.com', score: 'Celebrity 전체 편곡', amount: 6500, status: 'refunded', date: '2025-04-17 20:10' },
+  { id: 'ORD-2025-0838', user: '최하은', email: 'haeun@email.com', score: 'Supernova 풀밴드 스코어', amount: 8900, status: 'completed', date: '2025-04-17 16:44' },
+  { id: 'ORD-2025-0837', user: '정우진', email: 'woojin@email.com', score: '봄날 피아노 편곡', amount: 3500, status: 'pending', date: '2025-04-17 09:22' },
+  { id: 'ORD-2025-0836', user: '강나연', email: 'nayeon@email.com', score: 'Love Dive 베이스 TAB', amount: 3000, status: 'completed', date: '2025-04-16 18:55' },
+];
+
+const MOCK_USERS = [
+  { id: 1, name: '김민준', email: 'minjun@email.com', role: 'user', joined: '2024-11-20', orders: 12, points: 4500, status: 'active' },
+  { id: 2, name: '이서연', email: 'seoyeon@email.com', role: 'user', joined: '2025-01-05', orders: 7, points: 1200, status: 'active' },
+  { id: 3, name: '박지호', email: 'jiho@email.com', role: 'seller', joined: '2024-08-14', orders: 3, points: 800, status: 'active' },
+  { id: 4, name: '최하은', email: 'haeun@email.com', role: 'user', joined: '2025-02-28', orders: 5, points: 2300, status: 'active' },
+  { id: 5, name: '정우진', email: 'woojin@email.com', role: 'user', joined: '2025-03-10', orders: 1, points: 100, status: 'active' },
+  { id: 6, name: '강나연', email: 'nayeon@email.com', role: 'seller', joined: '2024-06-01', orders: 24, points: 9800, status: 'suspended' },
+];
+
+const WEEKLY_SALES = [
+  { label: '월', value: 124000 },
+  { label: '화', value: 89000 },
+  { label: '수', value: 210000 },
+  { label: '목', value: 176000 },
+  { label: '금', value: 320000 },
+  { label: '토', value: 298000 },
+  { label: '일', value: 145000 },
+];
+
+const ACTIVITY_LOG = [
+  { type: 'order',  text: '이서연님이 「Dynamite 드럼 악보」를 구매했습니다.',     time: '방금 전',    color: '#10B981' },
+  { type: 'score',  text: '새 악보 「어사용 민요 가야금」이 등록 승인 대기 중입니다.', time: '3분 전',    color: '#6366F1' },
+  { type: 'user',   text: '정우진님이 신규 가입했습니다.',                         time: '12분 전',   color: '#F97316' },
+  { type: 'order',  text: '박지호님의 주문이 환불 처리되었습니다.',                time: '1시간 전',  color: '#EF4444' },
+  { type: 'score',  text: '「봄날 피아노 편곡」이 이번 주 다운로드 1위입니다.',     time: '2시간 전',  color: '#F59E0B' },
+  { type: 'system', text: '일일 정산 보고서가 생성되었습니다.',                    time: '어제',      color: '#94A3B8' },
+];
+
+/* ════════════════════════════════════════════════════════════
+   HELPERS
+   ════════════════════════════════════════════════════════════ */
+const fmt = (n) => n.toLocaleString('ko-KR');
+const fmtW = (n) => `₩${n.toLocaleString('ko-KR')}`;
+
+function statusBadge(s) {
+  const map = {
+    active:    ['badge-success', '활성'],
+    inactive:  ['badge-muted',   '비활성'],
+    pending:   ['badge-warning', '승인대기'],
+    completed: ['badge-success', '완료'],
+    refunded:  ['badge-danger',  '환불'],
+    suspended: ['badge-danger',  '정지'],
+    seller:    ['badge-info',    '판매자'],
+    user:      ['badge-muted',   '사용자'],
+    admin:     ['badge-sky',     '관리자'],
+  };
+  const [cls, label] = map[s] || ['badge-muted', s];
+  return <span className={`badge ${cls}`}>{label}</span>;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ICONS  (inline SVG, consistent 18px)
+   ════════════════════════════════════════════════════════════ */
+const Icon = ({ name, size = 18, color = 'currentColor' }) => {
+  const paths = {
+    dashboard: <><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></>,
+    music:     <><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></>,
+    cart:      <><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></>,
+    users:     <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>,
+    settings:  <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></>,
+    logout:    <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></>,
+    plus:      <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
+    edit:      <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>,
+    trash:     <><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></>,
+    search:    <><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>,
+    x:         <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>,
+    menu:      <><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>,
+    trending:  <><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></>,
+    download:  <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
+    eye:       <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>,
+    bell:      <><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></>,
+    check:     <><polyline points="20 6 9 17 4 12"/></>,
+    warn:      <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+  };
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {paths[name]}
+    </svg>
+  );
+};
+
+/* ════════════════════════════════════════════════════════════
+   TOAST
+   ════════════════════════════════════════════════════════════ */
+function ToastContainer({ toasts }) {
+  return (
+    <div className="toast-wrap">
+      {toasts.map(t => (
+        <div key={t.id} className={`toast toast-${t.type}`}>{t.message}</div>
+      ))}
+    </div>
+  );
+}
+
+function useToast() {
+  const [toasts, setToasts] = useState([]);
+  const show = useCallback((message, type = 'success') => {
+    const id = Date.now();
+    setToasts(p => [...p, { id, message, type }]);
+    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), 3000);
+  }, []);
+  return { toasts, show };
+}
+
+/* ════════════════════════════════════════════════════════════
+   MODAL
+   ════════════════════════════════════════════════════════════ */
+function Modal({ title, onClose, children, footer }) {
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+        <div className="modal-header">
+          <span className="modal-title">{title}</span>
+          <button className="btn btn-ghost btn-sm" onClick={onClose} style={{padding: '4px'}}>
+            <Icon name="x" size={18} />
+          </button>
+        </div>
+        <div className="modal-body">{children}</div>
+        {footer && <div className="modal-footer">{footer}</div>}
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   SCORE MODAL
+   ════════════════════════════════════════════════════════════ */
+function ScoreModal({ score, onClose, onSave }) {
+  const isNew = !score;
+  const [form, setForm] = useState(score || {
+    title: '', artist: '', instrument: '피아노', genre: '발라드',
+    price: '', free: false, status: 'pending',
+  });
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  return (
+    <Modal
+      title={isNew ? '새 악보 등록' : '악보 수정'}
+      onClose={onClose}
+      footer={
+        <>
+          <button className="btn btn-secondary" onClick={onClose}>취소</button>
+          <button className="btn btn-primary" onClick={() => onSave(form)}>
+            {isNew ? '등록' : '저장'}
+          </button>
+        </>
+      }
+    >
+      <div className="form-group">
+        <label className="form-label">악보 제목</label>
+        <input className="input" value={form.title} onChange={e => set('title', e.target.value)} placeholder="악보 제목을 입력하세요" />
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label className="form-label">아티스트</label>
+          <input className="input" value={form.artist} onChange={e => set('artist', e.target.value)} placeholder="아티스트명" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">악기</label>
+          <select className="input" value={form.instrument} onChange={e => set('instrument', e.target.value)}>
+            {['피아노','기타','베이스','드럼','바이올린','첼로','플루트','가야금','풀밴드','피아노+현악'].map(i => <option key={i}>{i}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label className="form-label">장르</label>
+          <select className="input" value={form.genre} onChange={e => set('genre', e.target.value)}>
+            {['발라드','K-POP','팝','트로트','재즈','클래식','국악','록','R&B'].map(g => <option key={g}>{g}</option>)}
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">상태</label>
+          <select className="input" value={form.status} onChange={e => set('status', e.target.value)}>
+            <option value="active">활성</option>
+            <option value="pending">승인대기</option>
+            <option value="inactive">비활성</option>
+          </select>
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label className="form-label">판매 가격 (원)</label>
+          <input className="input" type="number" value={form.price} onChange={e => set('price', Number(e.target.value))} placeholder="0 = 무료" disabled={form.free} />
+        </div>
+        <div className="form-group" style={{display:'flex',alignItems:'center',gap:10,paddingTop:26}}>
+          <label className="toggle-wrap">
+            <input type="checkbox" checked={form.free} onChange={e => { set('free', e.target.checked); if(e.target.checked) set('price', 0); }} />
+            <span className="toggle-track"></span>
+            <span className="toggle-thumb"></span>
+          </label>
+          <span className="form-label" style={{margin:0}}>무료 악보</span>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   DELETE CONFIRM MODAL
+   ════════════════════════════════════════════════════════════ */
+function ConfirmModal({ message, onConfirm, onClose }) {
+  return (
+    <Modal
+      title="삭제 확인"
+      onClose={onClose}
+      footer={
+        <>
+          <button className="btn btn-secondary" onClick={onClose}>취소</button>
+          <button className="btn btn-danger" onClick={onConfirm}>삭제</button>
+        </>
+      }
+    >
+      <div style={{display:'flex',gap:12,alignItems:'flex-start'}}>
+        <Icon name="warn" size={22} color="#EF4444" />
+        <p style={{fontSize:'var(--text-sm)',lineHeight:1.6}}>{message}</p>
+      </div>
+    </Modal>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   DASHBOARD PAGE
+   ════════════════════════════════════════════════════════════ */
+function DashboardPage() {
+  const maxSale = Math.max(...WEEKLY_SALES.map(d => d.value));
+
+  return (
+    <div>
+      {/* KPI */}
+      <div className="kpi-grid">
+        {[
+          { label: '이번 달 매출', value: '₩2,847,000', trend: '+18.3%', up: true, icon: 'trending', iconBg: '#FFF7ED', iconColor: '#F97316' },
+          { label: '등록 악보', value: '148', trend: '+5 이번 주', up: true, icon: 'music', iconBg: '#E0E7FF', iconColor: '#6366F1' },
+          { label: '전체 회원', value: '3,241', trend: '+24 이번 주', up: true, icon: 'users', iconBg: '#D1FAE5', iconColor: '#10B981' },
+          { label: '이번 달 주문', value: '612', trend: '-3.1%', up: false, icon: 'cart', iconBg: '#FEF3C7', iconColor: '#F59E0B' },
+        ].map((k, i) => (
+          <div className="kpi-card" key={i}>
+            <div className="kpi-icon" style={{background: k.iconBg}}>
+              <Icon name={k.icon} size={22} color={k.iconColor} />
+            </div>
+            <div className="kpi-label">{k.label}</div>
+            <div className="kpi-value">{k.value}</div>
+            <div className="kpi-trend" style={{color: k.up ? 'var(--color-emerald-600)' : 'var(--color-red-500)'}}>
+              <span>{k.up ? '▲' : '▼'}</span>
+              <span>{k.trend}</span>
+              <span style={{color:'var(--fg-muted)',marginLeft:4}}>전월 대비</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts + Activity */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 340px',gap:24,marginBottom:32}}>
+        {/* Weekly Sales Chart */}
+        <div className="card" style={{padding:24}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
+            <h4>주간 매출 현황</h4>
+            <span className="badge badge-muted">최근 7일</span>
+          </div>
+          <div className="chart-bar-wrap">
+            {WEEKLY_SALES.map((d, i) => (
+              <div className="chart-bar-col" key={i}>
+                <div
+                  className="chart-bar"
+                  style={{
+                    height: `${(d.value / maxSale) * 100}%`,
+                    background: `linear-gradient(to top, var(--color-orange-500), var(--color-amber-400))`,
+                  }}
+                  title={fmtW(d.value)}
+                />
+                <span className="chart-bar-label">{d.label}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{display:'flex',justifyContent:'flex-end',marginTop:12}}>
+            <span style={{fontSize:'var(--text-xs)',color:'var(--fg-muted)'}}>
+              주간 합계: {fmtW(WEEKLY_SALES.reduce((s,d) => s+d.value, 0))}
+            </span>
+          </div>
+        </div>
+
+        {/* Activity */}
+        <div className="card" style={{padding:24}}>
+          <h4 style={{marginBottom:16}}>최근 활동</h4>
+          {ACTIVITY_LOG.map((a, i) => (
+            <div className="activity-item" key={i}>
+              <div className="activity-dot" style={{background: a.color}} />
+              <div>
+                <div className="activity-text">{a.text}</div>
+                <div className="activity-time">{a.time}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Top Scores */}
+      <div className="card">
+        <div style={{padding:'20px 24px 0'}}>
+          <h4>인기 악보 TOP 5</h4>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>순위</th><th>제목</th><th>아티스트</th><th>악기</th>
+                <th>다운로드</th><th>가격</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...MOCK_SCORES].sort((a,b) => b.downloads - a.downloads).slice(0,5).map((s, i) => (
+                <tr key={s.id}>
+                  <td>
+                    <span style={{
+                      display:'inline-flex',alignItems:'center',justifyContent:'center',
+                      width:24,height:24,borderRadius:'50%',
+                      background: i === 0 ? '#F59E0B' : i === 1 ? '#94A3B8' : i === 2 ? '#D97706' : 'var(--bg-muted)',
+                      color: i < 3 ? 'white' : 'var(--fg-muted)',
+                      fontSize:'var(--text-xs)',fontWeight:'var(--weight-bold)',
+                    }}>{i+1}</span>
+                  </td>
+                  <td style={{fontWeight:'var(--weight-medium)'}}>{s.title}</td>
+                  <td>{s.artist}</td>
+                  <td><span className="badge badge-info">{s.instrument}</span></td>
+                  <td>
+                    <span style={{display:'flex',alignItems:'center',gap:4}}>
+                      <Icon name="download" size={14} color="var(--fg-muted)" />
+                      {fmt(s.downloads)}
+                    </span>
+                  </td>
+                  <td>{s.free ? <span className="badge badge-success">무료</span> : fmtW(s.price)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   SCORES PAGE
+   ════════════════════════════════════════════════════════════ */
+function ScoresPage({ showToast }) {
+  const [scores, setScores]       = useState(MOCK_SCORES);
+  const [search, setSearch]       = useState('');
+  const [filterStatus, setFilter] = useState('all');
+  const [editTarget, setEdit]     = useState(null);
+  const [isNew, setIsNew]         = useState(false);
+  const [deleteTarget, setDel]    = useState(null);
+
+  const filtered = scores.filter(s => {
+    const matchSearch = s.title.includes(search) || s.artist.includes(search) || s.instrument.includes(search);
+    const matchStatus = filterStatus === 'all' || s.status === filterStatus;
+    return matchSearch && matchStatus;
+  });
+
+  const handleSave = (form) => {
+    if (isNew) {
+      setScores(p => [...p, { ...form, id: Date.now(), downloads: 0, date: new Date().toISOString().slice(0,10) }]);
+      showToast('악보가 등록되었습니다.');
+    } else {
+      setScores(p => p.map(s => s.id === editTarget.id ? { ...s, ...form } : s));
+      showToast('악보가 수정되었습니다.');
+    }
+    setEdit(null); setIsNew(false);
+  };
+
+  const handleDelete = () => {
+    setScores(p => p.filter(s => s.id !== deleteTarget.id));
+    showToast('악보가 삭제되었습니다.', 'error');
+    setDel(null);
+  };
+
+  return (
+    <div>
+      <div className="section-header">
+        <h3 className="section-title">악보 관리</h3>
+        <button className="btn btn-primary" onClick={() => setIsNew(true)}>
+          <Icon name="plus" size={16} color="white" /> 새 악보 등록
+        </button>
+      </div>
+
+      <div className="tab-list">
+        {[['all','전체'],['active','활성'],['pending','승인대기'],['inactive','비활성']].map(([v,l]) => (
+          <div key={v} className={`tab-item${filterStatus===v?' active':''}`} onClick={() => setFilter(v)}>{l}</div>
+        ))}
+      </div>
+
+      <div className="search-row">
+        <div className="search-input-wrap">
+          <span className="search-icon"><Icon name="search" size={16} /></span>
+          <input className="input search-input-wrap" style={{paddingLeft:38}} placeholder="제목, 아티스트, 악기 검색..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <span style={{fontSize:'var(--text-sm)',color:'var(--fg-muted)'}}>총 {filtered.length}개</span>
+      </div>
+
+      <div className="card">
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr><th>제목</th><th>아티스트</th><th>악기</th><th>장르</th><th>가격</th><th>다운로드</th><th>상태</th><th>등록일</th><th>작업</th></tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={9}>
+                  <div className="empty-state">
+                    <Icon name="music" size={40} color="var(--fg-muted)" />
+                    <p>검색 결과가 없습니다.</p>
+                  </div>
+                </td></tr>
+              ) : filtered.map(s => (
+                <tr key={s.id}>
+                  <td style={{fontWeight:'var(--weight-medium)',maxWidth:200}}>{s.title}</td>
+                  <td>{s.artist}</td>
+                  <td><span className="badge badge-info">{s.instrument}</span></td>
+                  <td>{s.genre}</td>
+                  <td>{s.free ? <span className="badge badge-success">무료</span> : fmtW(s.price)}</td>
+                  <td style={{fontFamily:'var(--font-mono)',fontSize:'var(--text-sm)'}}>{fmt(s.downloads)}</td>
+                  <td>{statusBadge(s.status)}</td>
+                  <td style={{fontSize:'var(--text-xs)',color:'var(--fg-muted)'}}>{s.date}</td>
+                  <td>
+                    <div style={{display:'flex',gap:6}}>
+                      <button className="btn btn-secondary btn-sm" onClick={() => setEdit(s)} title="수정">
+                        <Icon name="edit" size={14} />
+                      </button>
+                      <button className="btn btn-danger btn-sm" onClick={() => setDel(s)} title="삭제">
+                        <Icon name="trash" size={14} color="white" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {(isNew || editTarget) && (
+        <ScoreModal
+          score={editTarget}
+          onClose={() => { setEdit(null); setIsNew(false); }}
+          onSave={handleSave}
+        />
+      )}
+      {deleteTarget && (
+        <ConfirmModal
+          message={`「${deleteTarget.title}」을(를) 삭제하면 복구할 수 없습니다. 계속하시겠습니까?`}
+          onConfirm={handleDelete}
+          onClose={() => setDel(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   ORDERS PAGE
+   ════════════════════════════════════════════════════════════ */
+function OrdersPage({ showToast }) {
+  const [orders, setOrders] = useState(MOCK_ORDERS);
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilter] = useState('all');
+
+  const filtered = orders.filter(o => {
+    const matchSearch = o.id.includes(search) || o.user.includes(search) || o.score.includes(search);
+    const matchStatus = filterStatus === 'all' || o.status === filterStatus;
+    return matchSearch && matchStatus;
+  });
+
+  const handleRefund = (id) => {
+    setOrders(p => p.map(o => o.id === id ? { ...o, status: 'refunded' } : o));
+    showToast('환불 처리되었습니다.', 'info');
+  };
+
+  const totalRevenue = orders.filter(o => o.status === 'completed').reduce((s,o) => s + o.amount, 0);
+  const totalRefunded = orders.filter(o => o.status === 'refunded').reduce((s,o) => s + o.amount, 0);
+
+  return (
+    <div>
+      <div className="section-header">
+        <h3 className="section-title">주문 관리</h3>
+        <div style={{display:'flex',gap:12}}>
+          <div className="kpi-card" style={{padding:'12px 20px',display:'flex',flexDirection:'column',gap:2}}>
+            <span style={{fontSize:'var(--text-xs)',color:'var(--fg-muted)'}}>완료 매출</span>
+            <span style={{fontWeight:'var(--weight-bold)',color:'var(--color-emerald-600)'}}>{fmtW(totalRevenue)}</span>
+          </div>
+          <div className="kpi-card" style={{padding:'12px 20px',display:'flex',flexDirection:'column',gap:2}}>
+            <span style={{fontSize:'var(--text-xs)',color:'var(--fg-muted)'}}>환불 금액</span>
+            <span style={{fontWeight:'var(--weight-bold)',color:'var(--color-red-600)'}}>{fmtW(totalRefunded)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="tab-list">
+        {[['all','전체'],['completed','완료'],['pending','대기'],['refunded','환불']].map(([v,l]) => (
+          <div key={v} className={`tab-item${filterStatus===v?' active':''}`} onClick={() => setFilter(v)}>{l}</div>
+        ))}
+      </div>
+
+      <div className="search-row">
+        <div className="search-input-wrap">
+          <span className="search-icon"><Icon name="search" size={16} /></span>
+          <input className="input" style={{paddingLeft:38}} placeholder="주문번호, 회원명, 악보명 검색..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <span style={{fontSize:'var(--text-sm)',color:'var(--fg-muted)'}}>총 {filtered.length}건</span>
+      </div>
+
+      <div className="card">
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr><th>주문번호</th><th>회원</th><th>악보</th><th>금액</th><th>상태</th><th>일시</th><th>작업</th></tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={7}>
+                  <div className="empty-state">
+                    <Icon name="cart" size={40} color="var(--fg-muted)" />
+                    <p>주문 내역이 없습니다.</p>
+                  </div>
+                </td></tr>
+              ) : filtered.map(o => (
+                <tr key={o.id}>
+                  <td style={{fontFamily:'var(--font-mono)',fontSize:'var(--text-xs)'}}>{o.id}</td>
+                  <td>
+                    <div style={{fontWeight:'var(--weight-medium)'}}>{o.user}</div>
+                    <div style={{fontSize:'var(--text-xs)',color:'var(--fg-muted)'}}>{o.email}</div>
+                  </td>
+                  <td style={{maxWidth:180}}>{o.score}</td>
+                  <td style={{fontWeight:'var(--weight-semibold)'}}>{fmtW(o.amount)}</td>
+                  <td>{statusBadge(o.status)}</td>
+                  <td style={{fontSize:'var(--text-xs)',color:'var(--fg-muted)'}}>{o.date}</td>
+                  <td>
+                    {o.status === 'completed' && (
+                      <button className="btn btn-secondary btn-sm" onClick={() => handleRefund(o.id)}>환불</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   USERS PAGE
+   ════════════════════════════════════════════════════════════ */
+function UsersPage({ showToast }) {
+  const [users, setUsers]     = useState(MOCK_USERS);
+  const [search, setSearch]   = useState('');
+  const [filterRole, setRole] = useState('all');
+
+  const filtered = users.filter(u => {
+    const matchSearch = u.name.includes(search) || u.email.includes(search);
+    const matchRole   = filterRole === 'all' || u.role === filterRole;
+    return matchSearch && matchRole;
+  });
+
+  const toggleStatus = (id) => {
+    setUsers(p => p.map(u => u.id === id
+      ? { ...u, status: u.status === 'active' ? 'suspended' : 'active' }
+      : u
+    ));
+    showToast('회원 상태가 변경되었습니다.', 'info');
+  };
+
+  return (
+    <div>
+      <div className="section-header">
+        <h3 className="section-title">회원 관리</h3>
+        <div style={{display:'flex',gap:8,fontSize:'var(--text-sm)',color:'var(--fg-muted)'}}>
+          <span>전체 <strong style={{color:'var(--fg-primary)'}}>{users.length}</strong>명</span>
+          <span>·</span>
+          <span>판매자 <strong style={{color:'var(--fg-primary)'}}>{users.filter(u=>u.role==='seller').length}</strong>명</span>
+        </div>
+      </div>
+
+      <div className="tab-list">
+        {[['all','전체'],['user','일반 사용자'],['seller','판매자']].map(([v,l]) => (
+          <div key={v} className={`tab-item${filterRole===v?' active':''}`} onClick={() => setRole(v)}>{l}</div>
+        ))}
+      </div>
+
+      <div className="search-row">
+        <div className="search-input-wrap">
+          <span className="search-icon"><Icon name="search" size={16} /></span>
+          <input className="input" style={{paddingLeft:38}} placeholder="이름, 이메일 검색..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <span style={{fontSize:'var(--text-sm)',color:'var(--fg-muted)'}}>총 {filtered.length}명</span>
+      </div>
+
+      <div className="card">
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr><th>이름</th><th>이메일</th><th>역할</th><th>가입일</th><th>주문수</th><th>포인트</th><th>상태</th><th>작업</th></tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={8}>
+                  <div className="empty-state">
+                    <Icon name="users" size={40} color="var(--fg-muted)" />
+                    <p>회원이 없습니다.</p>
+                  </div>
+                </td></tr>
+              ) : filtered.map(u => (
+                <tr key={u.id}>
+                  <td style={{fontWeight:'var(--weight-medium)'}}>{u.name}</td>
+                  <td style={{fontSize:'var(--text-sm)',color:'var(--fg-secondary)'}}>{u.email}</td>
+                  <td>{statusBadge(u.role)}</td>
+                  <td style={{fontSize:'var(--text-xs)',color:'var(--fg-muted)'}}>{u.joined}</td>
+                  <td>{u.orders}건</td>
+                  <td style={{fontFamily:'var(--font-mono)',fontSize:'var(--text-sm)'}}>{fmt(u.points)}P</td>
+                  <td>{statusBadge(u.status)}</td>
+                  <td>
+                    <button
+                      className={`btn btn-sm ${u.status === 'active' ? 'btn-secondary' : 'btn-primary'}`}
+                      onClick={() => toggleStatus(u.id)}
+                    >
+                      {u.status === 'active' ? '정지' : '복구'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   SETTINGS PAGE
+   ════════════════════════════════════════════════════════════ */
+function SettingsPage({ showToast }) {
+  const [settings, setSettings] = useState({
+    siteName: 'ScoreStore',
+    siteDesc: '디지털 악보 마켓',
+    email: 'admin@scorestore.kr',
+    freeEnabled: true,
+    reviewEnabled: true,
+    emailNotify: true,
+    maintenanceMode: false,
+    pointRate: 3,
+    minWithdraw: 10000,
+  });
+  const set = (k, v) => setSettings(p => ({ ...p, [k]: v }));
+
+  return (
+    <div style={{maxWidth: 680}}>
+      <div className="section-header">
+        <h3 className="section-title">사이트 설정</h3>
+      </div>
+
+      <div className="card" style={{padding:28,marginBottom:24}}>
+        <div className="settings-section">
+          <div className="settings-section-title">기본 정보</div>
+          <div className="form-group">
+            <label className="form-label">사이트명</label>
+            <input className="input" value={settings.siteName} onChange={e => set('siteName', e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">사이트 설명</label>
+            <input className="input" value={settings.siteDesc} onChange={e => set('siteDesc', e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">관리자 이메일</label>
+            <input className="input" type="email" value={settings.email} onChange={e => set('email', e.target.value)} />
+          </div>
+        </div>
+
+        <div className="settings-section">
+          <div className="settings-section-title">기능 설정</div>
+          {[
+            { key: 'freeEnabled', label: '무료 악보 업로드 허용', desc: '회원이 무료 악보를 업로드할 수 있습니다.' },
+            { key: 'reviewEnabled', label: '악보 리뷰 기능', desc: '구매자가 악보에 리뷰를 작성할 수 있습니다.' },
+            { key: 'emailNotify', label: '이메일 알림', desc: '신규 주문 시 관리자 이메일로 알림을 발송합니다.' },
+            { key: 'maintenanceMode', label: '점검 모드', desc: '활성화 시 일반 사용자에게 점검 페이지가 표시됩니다.' },
+          ].map(row => (
+            <div className="settings-row" key={row.key}>
+              <div>
+                <div className="settings-label">{row.label}</div>
+                <div className="settings-desc">{row.desc}</div>
+              </div>
+              <label className="toggle-wrap">
+                <input type="checkbox" checked={settings[row.key]} onChange={e => set(row.key, e.target.checked)} />
+                <span className="toggle-track"></span>
+                <span className="toggle-thumb"></span>
+              </label>
+            </div>
+          ))}
+        </div>
+
+        <div className="settings-section">
+          <div className="settings-section-title">포인트 설정</div>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">포인트 적립율 (%)</label>
+              <input className="input" type="number" min="0" max="20" value={settings.pointRate} onChange={e => set('pointRate', Number(e.target.value))} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">최소 출금 금액 (원)</label>
+              <input className="input" type="number" min="1000" value={settings.minWithdraw} onChange={e => set('minWithdraw', Number(e.target.value))} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{display:'flex',justifyContent:'flex-end'}}>
+        <button className="btn btn-primary" onClick={() => showToast('설정이 저장되었습니다.')}>
+          <Icon name="check" size={16} color="white" /> 설정 저장
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   SIDEBAR
+   ════════════════════════════════════════════════════════════ */
+const NAV_ITEMS = [
+  { page: 'dashboard', label: '대시보드',  icon: 'dashboard' },
+  { page: 'scores',    label: '악보 관리', icon: 'music'     },
+  { page: 'orders',    label: '주문 관리', icon: 'cart'      },
+  { page: 'users',     label: '회원 관리', icon: 'users'     },
+  { page: 'settings',  label: '설정',     icon: 'settings'  },
+];
+
+function Sidebar({ currentPage, onNavigate, onLogout, sidebarOpen }) {
+  return (
+    <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
+      <div className="sidebar-logo">
+        <div className="sidebar-logo-title">🎵 ScoreStore</div>
+        <div className="sidebar-logo-sub">관리자 패널</div>
+      </div>
+
+      <nav className="sidebar-nav">
+        <div className="nav-section-label">메뉴</div>
+        {NAV_ITEMS.map(item => (
+          <div
+            key={item.page}
+            className={`nav-item${currentPage === item.page ? ' active' : ''}`}
+            onClick={() => onNavigate(item.page)}
+          >
+            <Icon name={item.icon} size={18} />
+            <span>{item.label}</span>
+          </div>
+        ))}
+      </nav>
+
+      <div className="sidebar-footer">
+        <div className="sidebar-admin-info">
+          <div className="admin-avatar">A</div>
+          <div style={{flex:1}}>
+            <div className="admin-name">관리자</div>
+            <div className="admin-role">Super Admin</div>
+          </div>
+          <button className="btn btn-ghost btn-sm" onClick={onLogout} title="로그아웃" style={{color:'var(--color-slate-400)',padding:6}}>
+            <Icon name="logout" size={16} />
+          </button>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   LOGIN PAGE
+   ════════════════════════════════════════════════════════════ */
+function LoginPage({ onLogin }) {
+  const [pw, setPw]       = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      if (pw === 'admin1234') {
+        onLogin();
+      } else {
+        setError('비밀번호가 올바르지 않습니다.');
+        setLoading(false);
+      }
+    }, 600);
+  };
+
+  return (
+    <div className="login-wrap">
+      <div className="login-card">
+        <div className="login-logo">🎵 ScoreStore</div>
+        <div className="login-sub">관리자 전용 패널입니다.</div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">비밀번호</label>
+            <input
+              className="input"
+              type="password"
+              value={pw}
+              onChange={e => { setPw(e.target.value); setError(''); }}
+              placeholder="관리자 비밀번호 입력"
+              autoFocus
+            />
+            {error && (
+              <div style={{display:'flex',alignItems:'center',gap:6,marginTop:8,color:'var(--color-red-600)',fontSize:'var(--text-sm)'}}>
+                <Icon name="warn" size={14} color="var(--color-red-600)" />
+                {error}
+              </div>
+            )}
+          </div>
+          <button className="btn btn-primary" type="submit" disabled={loading} style={{width:'100%',marginTop:8}}>
+            {loading ? '확인 중...' : '로그인'}
+          </button>
+        </form>
+
+        <div style={{marginTop:24,padding:16,background:'var(--color-slate-50)',borderRadius:'var(--radius-sm)',fontSize:'var(--text-xs)',color:'var(--fg-muted)'}}>
+          <strong>데모 비밀번호:</strong> admin1234
+        </div>
+
+        <div style={{marginTop:20,textAlign:'center'}}>
+          <a href="index.html" style={{fontSize:'var(--text-sm)',color:'var(--fg-muted)',textDecoration:'none'}}>
+            ← 메인 스토어로 돌아가기
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   APP
+   ════════════════════════════════════════════════════════════ */
+const PAGE_TITLES = {
+  dashboard: '대시보드',
+  scores:    '악보 관리',
+  orders:    '주문 관리',
+  users:     '회원 관리',
+  settings:  '설정',
+};
+
+function App() {
+  const [authed, setAuthed]         = useState(() => sessionStorage.getItem('admin_auth') === '1');
+  const [page, setPage]             = useState('dashboard');
+  const [sidebarOpen, setSidebar]   = useState(false);
+  const { toasts, show: showToast } = useToast();
+
+  const login  = () => { sessionStorage.setItem('admin_auth', '1'); setAuthed(true); };
+  const logout = () => { sessionStorage.removeItem('admin_auth'); setAuthed(false); };
+
+  const navigate = (p) => { setPage(p); setSidebar(false); };
+
+  if (!authed) return <LoginPage onLogin={login} />;
+
+  const renderPage = () => {
+    switch (page) {
+      case 'dashboard': return <DashboardPage />;
+      case 'scores':    return <ScoresPage showToast={showToast} />;
+      case 'orders':    return <OrdersPage showToast={showToast} />;
+      case 'users':     return <UsersPage showToast={showToast} />;
+      case 'settings':  return <SettingsPage showToast={showToast} />;
+      default:          return <DashboardPage />;
+    }
+  };
+
+  return (
+    <>
+      <ToastContainer toasts={toasts} />
+      <div className="admin-layout">
+        <Sidebar currentPage={page} onNavigate={navigate} onLogout={logout} sidebarOpen={sidebarOpen} />
+
+        {/* Mobile overlay */}
+        {sidebarOpen && (
+          <div
+            onClick={() => setSidebar(false)}
+            style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.4)',zIndex:99}}
+          />
+        )}
+
+        <div className="main-content">
+          <div className="topbar">
+            <div style={{display:'flex',alignItems:'center',gap:12}}>
+              <button className="mobile-menu-btn" onClick={() => setSidebar(p => !p)}>
+                <Icon name="menu" size={20} />
+              </button>
+              <span className="topbar-title">{PAGE_TITLES[page]}</span>
+            </div>
+            <div className="topbar-actions">
+              <a href="index.html" className="btn btn-secondary btn-sm" style={{textDecoration:'none'}}>
+                <Icon name="eye" size={14} /> 스토어 보기
+              </a>
+              <button className="btn btn-ghost btn-sm" title="알림">
+                <Icon name="bell" size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div className="page-body">
+            {renderPage()}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
