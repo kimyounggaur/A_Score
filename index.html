@@ -742,10 +742,18 @@ const BUNDLES = [
 ];
 
 const INSTRUMENTS = [
-  { label: '통기타', emoji: '🎸' }, { label: '일렉기타', emoji: '⚡' },
-  { label: '베이스', emoji: '🎸' }, { label: '드럼', emoji: '🥁' },
-  { label: '피아노', emoji: '🎹' }, { label: '우쿨렐레', emoji: '🪕' },
-  { label: '무료', emoji: '🎁' },
+  { label: '멜로디',    emoji: '🎵', key: 'category-melody' },
+  { label: '피아노',    emoji: '🎹', key: 'category-piano' },
+  { label: '통기타',    emoji: '🎸', key: 'category-acoustic' },
+  { label: '일렉기타',  emoji: '⚡', key: 'category-electric' },
+  { label: '베이스 기타', emoji: '🎸', key: 'category-bass' },
+  { label: '우쿨렐레',  emoji: '🪕', key: 'category-ukulele' },
+  { label: '드럼',      emoji: '🥁', key: 'category-drums' },
+  { label: '칼림바',    emoji: '🎵', key: 'category-kalimba' },
+  { label: '텅드럼',    emoji: '🪘', key: 'category-tongue-drum' },
+  { label: '하모니카',  emoji: '🎶', key: 'category-harmonica' },
+  { label: '오카리나',  emoji: '🎵', key: 'category-ocarina' },
+  { label: '색깔악보',  emoji: '🌈', key: 'category-color' },
 ];
 
 /* ─── HomePage ────────────────────────────────────────────── */
@@ -800,7 +808,7 @@ function HomePage({ onSelectScore }) {
       <div style={{ background: '#fff', padding: '16px 0', borderBottom: '1px solid #E2E8F0', overflowX: 'auto' }}>
         <div style={{ display: 'flex', gap: 0, minWidth: 'max-content', padding: '0 16px' }}>
           {INSTRUMENTS.map(inst => (
-            <button key={inst.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 14px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+            <button key={inst.label} onClick={() => setPage(inst.key)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 14px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
               <span style={{ fontSize: 26 }}>{inst.emoji}</span>
               <span style={{ fontSize: 11, fontWeight: 500, color: '#475569', whiteSpace: 'nowrap' }}>{inst.label}</span>
             </button>
@@ -937,7 +945,7 @@ function PlaceholderPage({ page, onNavigate }) {
 }
 
 /* ─── Root App ────────────────────────────────────────────── */
-const PLACEHOLDER_PAGES = new Set(['search','cart','notifications','mypage','bundles','free','login','category-guitar','category-bass','category-drums']);
+const PLACEHOLDER_PAGES = new Set(['search','cart','notifications','mypage','bundles','free','login','category-melody','category-piano','category-acoustic','category-electric','category-bass','category-ukulele','category-drums','category-kalimba','category-tongue-drum','category-harmonica','category-ocarina','category-color']);
 
 function App() {
   const [page, setPage] = useState(() => localStorage.getItem('ss_page') || 'home');
