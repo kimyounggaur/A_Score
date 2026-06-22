@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&amp;family=Noto+Serif+KR:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+@font-face { font-family:'MaruBuri'; src:url('ui_kits/scorestore/fonts/MaruBuri-Light.otf') format('opentype'); font-weight:300; font-style:normal; font-display:swap; }
+@keyframes ssFadeUp { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
+@keyframes ssPop { 0%{transform:scale(.9);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif; background:#F1F5F9; -webkit-font-smoothing:antialiased; word-break:keep-all; }
+.ss-scroll::-webkit-scrollbar { height:6px; width:6px; }
+.ss-scroll::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:3px; }
+@media (max-width:820px){ .ss-d{ display:none !important; } }
+@media (min-width:821px){ .ss-m{ display:none !important; } }
+</style>
+</helmet>
+<div style="min-height:100vh; background:#F1F5F9; display:flex; justify-content:center;">
+<div style="width:100%; max-width:1180px; background:#F8FAFC; min-height:100vh; position:relative; box-shadow:0 0 0 1px #E2E8F0;">
+
+<sc-if value="{{ showHeader }}" hint-placeholder-val="{{ true }}">
+<header style="background:#fff; border-bottom:1px solid #E2E8F0; position:sticky; top:0; z-index:50; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+  <div style="padding:0 16px; height:58px; display:flex; align-items:center; gap:16px;">
+    <button onClick="{{ goHome }}" style="background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:4px; flex-shrink:0;">
+      <span style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:21px; font-weight:300; color:#F97316;">Score</span>
+      <span style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:21px; font-weight:300; color:#0F172A;">Store</span>
+      <span style="color:#F97316; font-size:18px; line-height:1;">♪</span>
+    </button>
+    <nav class="ss-d" style="display:flex; gap:2px; flex:1;">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+        
+      </sc-for>
+    </nav>
+    <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
+      <button onClick="{{ goPoints }}" style="background:#FEF3C7; color:#92400E; border:none; border-radius:9999px; padding:5px 12px; font-size:12px; font-weight:700; cursor:pointer; flex-shrink:0; font-family:inherit;">◆ {{ pointsLabel }}P</button>
+      <button onClick="{{ goSearch }}" class="ss-d" style="background:none; border:none; cursor:pointer; padding:7px; border-radius:8px; color:#64748B; display:flex;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+      </button>
+      <button onClick="{{ goNotif }}" style="background:none; border:none; cursor:pointer; padding:7px; border-radius:8px; color:#64748B; position:relative; display:flex;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}"><span style="position:absolute; top:5px; right:5px; width:8px; height:8px; background:#EF4444; border-radius:50%; border:1.5px solid #fff;"></span></sc-if>
+      </button>
+      <button onClick="{{ goCart }}" style="background:none; border:none; cursor:pointer; padding:7px; border-radius:8px; color:#64748B; position:relative; display:flex;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ true }}"><span style="position:absolute; top:1px; right:1px; background:#F97316; color:#fff; border-radius:50%; min-width:16px; height:16px; padding:0 3px; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;">{{ cartCount }}</span></sc-if>
+      </button>
+      <button onClick="{{ onAuthBtn }}" style="background:#F97316; color:#fff; border:none; cursor:pointer; padding:8px 15px; border-radius:8px; font-size:13px; font-weight:600; font-family:inherit;">{{ authLabel }}</button>
+    </div>
+  </div>
+</header>
+</sc-if>
+
+<div style="padding-bottom:0;">
+
+<!-- ══════════ HOME ══════════ -->
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div style="animation:ssFadeUp .3s ease;">
+  <div style="background:{{ heroBg }}; padding:48px 24px; text-align:center; min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; transition:background .6s ease;">
+    <div style="font-size:12px; font-weight:700; letter-spacing:.14em; color:rgba(255,255,255,.55); margin-bottom:12px;">{{ heroKicker }}</div>
+    <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:30px; font-weight:300; color:#fff; margin-bottom:8px;">{{ heroTitle }}</h2>
+    <p style="font-size:14px; color:rgba(255,255,255,.7); margin-bottom:20px;">{{ heroSub }}</p>
+    <button onClick="{{ heroCta }}" style="background:#F97316; color:#fff; border:none; border-radius:9999px; padding:11px 28px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">{{ heroBtn }}</button>
+    <div style="display:flex; gap:6px; margin-top:20px;">
+      <sc-for list="{{ heroDots }}" as="d" hint-placeholder-count="3">
+        <div style="width:{{ d.w }}; height:6px; border-radius:3px; background:{{ d.bg }}; transition:all .3s;"></div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="background:#fff; padding:16px 0; border-bottom:1px solid #E2E8F0; overflow-x:auto;" class="ss-scroll">
+    <div style="display:flex; gap:0; min-width:max-content; padding:0 16px;">
+      <sc-for list="{{ instruments }}" as="inst" hint-placeholder-count="12">
+        <button onClick="{{ inst.onClick }}" style="display:flex; flex-direction:column; align-items:center; gap:5px; padding:6px 16px; background:none; border:none; cursor:pointer; font-family:inherit;">
+          <span style="font-size:27px;">{{ inst.emoji }}</span>
+          <span style="font-size:11px; font-weight:500; color:#475569; white-space:nowrap;">{{ inst.label }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex; align-items:flex-start;">
+    <div class="ss-d ss-scroll" style="width:74px; flex-shrink:0; background:#fff; border-right:1px solid #E2E8F0; position:sticky; top:58px; max-height:calc(100vh - 58px); overflow-y:auto; padding:8px 0 16px;">
+      <sc-for list="{{ sidebarInstruments }}" as="inst" hint-placeholder-count="11">
+        <button onClick="{{ inst.onClick }}" style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 4px; width:100%; background:none; border:none; cursor:pointer; font-family:inherit;">
+          <span style="font-size:20px;">{{ inst.emoji }}</span>
+          <span style="font-size:9px; font-weight:500; color:#475569; white-space:nowrap; line-height:1.3;">{{ inst.label }}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="flex:1; min-width:0;">
+      <div style="max-width:1040px; margin:0 auto; padding:0 16px 40px;">
+
+        <div style="margin-top:28px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:19px; font-weight:300; color:#0F172A;">🆕 신곡</h2>
+            <button onClick="{{ goSearch }}" style="background:none; border:none; cursor:pointer; font-size:13px; color:#94A3B8; font-family:inherit;">더보기 →</button>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;">
+            <sc-for list="{{ newScores }}" as="s" hint-placeholder-count="4">
+              <div onClick="{{ s.onSelect }}" style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                <div style="position:relative; background:{{ s.grad }}; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center;">
+                  <span style="font-size:48px; opacity:.15; color:#fff;">♪</span>
+                  <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px; flex-wrap:wrap;">
+                    <sc-for list="{{ s.badgeList }}" as="b" hint-placeholder-count="1"><span style="background:{{ b.bg }}; color:{{ b.fg }}; padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:700; line-height:1.6;">{{ b.text }}</span></sc-for>
+                  </div>
+                  <button onClick="{{ s.onWish }}" style="position:absolute; top:8px; right:8px; background:none; border:none; cursor:pointer; color:{{ s.wishColor }}; font-size:18px; line-height:1;">{{ s.wishIcon }}</button>
+                </div>
+                <div style="padding:10px 12px 14px;">
+                  <div style="font-size:13px; font-weight:600; color:#0F172A; line-height:1.35; margin-bottom:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ s.title }}</div>
+                  <div style="font-size:11px; color:#64748B; margin-bottom:6px;">{{ s.artist }}</div>
+                  <div style="font-size:13px; color:#FBBF24; letter-spacing:1px; margin-bottom:4px;">{{ s.stars }}</div>
+                  <div style="display:flex; align-items:baseline; gap:5px; flex-wrap:wrap;">
+                    <sc-if value="{{ s.hasDiscount }}" hint-placeholder-val="{{ true }}"><span style="font-size:11px; color:#94A3B8; text-decoration:line-through;">{{ s.priceStr }}</span></sc-if>
+                    <span style="font-size:15px; font-weight:700; color:{{ s.priceColor }};">{{ s.payStr }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;">
+          <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:19px; font-weight:300; color:#0F172A; margin-bottom:8px;">🔥 인기곡 TOP</h2>
+          <div style="display:flex; flex-direction:column;">
+            <sc-for list="{{ topScores }}" as="s" hint-placeholder-count="5">
+              <button onClick="{{ s.onSelect }}" style="display:flex; align-items:center; gap:12px; padding:12px 0; background:none; border:none; border-bottom:1px solid #F1F5F9; cursor:pointer; text-align:left; width:100%; font-family:inherit;">
+                <span style="font-size:16px; font-weight:700; color:{{ s.rankColor }}; width:24px; flex-shrink:0;">{{ s.rank }}</span>
+                <div style="width:42px; height:42px; border-radius:8px; background:{{ s.grad }}; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.3); font-size:16px;">♪</div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:13px; font-weight:600; color:#0F172A; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ s.title }}</div>
+                  <div style="font-size:11px; color:#64748B;">{{ s.artist }}</div>
+                </div>
+                <span style="font-size:14px; font-weight:700; color:{{ s.priceColor }};">{{ s.payStr }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:19px; font-weight:300; color:#0F172A;">📚 악보집</h2>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;">
+            <sc-for list="{{ bundles }}" as="s" hint-placeholder-count="2">
+              <div onClick="{{ s.onSelect }}" style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                <div style="position:relative; background:{{ s.grad }}; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center;">
+                  <span style="font-size:38px; opacity:.18;">📚</span>
+                  <div style="position:absolute; top:8px; left:8px;"><span style="background:#E0E7FF; color:#4F46E5; padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:700;">악보집</span></div>
+                </div>
+                <div style="padding:12px 14px 14px;">
+                  <div style="font-size:14px; font-weight:600; color:#0F172A; margin-bottom:2px;">{{ s.title }}</div>
+                  <div style="font-size:11px; color:#64748B; margin-bottom:8px;">{{ s.subtitle }}</div>
+                  <div style="display:flex; align-items:baseline; gap:6px;">
+                    <span style="font-size:12px; color:#94A3B8; text-decoration:line-through;">{{ s.priceStr }}</span>
+                    <span style="font-size:16px; font-weight:700; color:#EF4444;">{{ s.payStr }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;">
+          <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:19px; font-weight:300; color:#0F172A; margin-bottom:14px;">🎨 특별 카테고리</h2>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px;">
+            <sc-for list="{{ catPromos }}" as="c" hint-placeholder-count="2">
+              <button onClick="{{ c.onClick }}" style="position:relative; background:{{ c.bg }}; border:none; border-radius:16px; padding:24px; cursor:pointer; text-align:left; overflow:hidden; font-family:inherit;">
+                <div style="position:absolute; right:-6px; bottom:-10px; font-size:80px; opacity:.2;">{{ c.emoji }}</div>
+                <div style="font-size:19px; font-weight:700; color:#fff; margin-bottom:4px; position:relative;">{{ c.label }}</div>
+                <div style="font-size:13px; color:rgba(255,255,255,.85); position:relative;">{{ c.sub }}</div>
+                <div style="display:inline-flex; align-items:center; gap:4px; margin-top:14px; background:rgba(255,255,255,.2); color:#fff; padding:6px 14px; border-radius:9999px; font-size:12px; font-weight:600; position:relative;">바로가기 →</div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;">
+          <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:19px; font-weight:300; color:#0F172A; margin-bottom:14px;">✍️ 인기 편곡자</h2>
+          <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:6px;" class="ss-scroll">
+            <sc-for list="{{ popularArrangers }}" as="a" hint-placeholder-count="5">
+              <button onClick="{{ a.onClick }}" style="flex-shrink:0; width:140px; background:#fff; border:1px solid #E2E8F0; border-radius:14px; padding:18px 14px; cursor:pointer; text-align:center; font-family:inherit;">
+                <div style="width:52px; height:52px; border-radius:50%; background:{{ a.color }}; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; font-weight:700;">{{ a.initial }}</div>
+                <div style="font-size:14px; font-weight:700; color:#0F172A; margin-bottom:2px;">{{ a.name }}</div>
+                <div style="font-size:11px; color:#94A3B8; line-height:1.4; margin-bottom:8px;">{{ a.specialty }}</div>
+                <div style="font-size:11px; color:#F97316; font-weight:600;">악보 {{ a.count }}곡</div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:19px; font-weight:300; color:#0F172A;">🎁 무료 악보</h2>
+            <button onClick="{{ goFree }}" style="background:none; border:none; cursor:pointer; font-size:13px; color:#94A3B8; font-family:inherit;">더보기 →</button>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;">
+            <sc-for list="{{ freeScores }}" as="s" hint-placeholder-count="3">
+              <div onClick="{{ s.onSelect }}" style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                <div style="position:relative; background:{{ s.grad }}; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center;">
+                  <span style="font-size:48px; opacity:.15; color:#fff;">♪</span>
+                  <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px; flex-wrap:wrap;">
+                    <sc-for list="{{ s.badgeList }}" as="b" hint-placeholder-count="1"><span style="background:{{ b.bg }}; color:{{ b.fg }}; padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:700; line-height:1.6;">{{ b.text }}</span></sc-for>
+                  </div>
+                  <button onClick="{{ s.onWish }}" style="position:absolute; top:8px; right:8px; background:none; border:none; cursor:pointer; color:{{ s.wishColor }}; font-size:18px; line-height:1;">{{ s.wishIcon }}</button>
+                </div>
+                <div style="padding:10px 12px 14px;">
+                  <div style="font-size:13px; font-weight:600; color:#0F172A; line-height:1.35; margin-bottom:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ s.title }}</div>
+                  <div style="font-size:11px; color:#64748B; margin-bottom:6px;">{{ s.artist }}</div>
+                  <div style="font-size:13px; color:#FBBF24; letter-spacing:1px; margin-bottom:4px;">{{ s.stars }}</div>
+                  <span style="font-size:15px; font-weight:700; color:#10B981;">무료</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ══════════ COLOR SCORES ══════════ -->
+<sc-if value="{{ isColorScore }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh; animation:ssFadeUp .3s ease;">
+  <div style="background:linear-gradient(135deg,#EC4899 0%,#8B5CF6 50%,#3B82F6 100%); padding:32px 24px 40px; position:relative;">
+    <button onClick="{{ colorBack }}" style="background:rgba(255,255,255,.2); border:none; cursor:pointer; color:#fff; border-radius:8px; padding:6px 12px; font-size:18px; backdrop-filter:blur(8px); margin-bottom:18px;">←</button>
+    <div style="font-size:13px; font-weight:700; letter-spacing:.14em; color:rgba(255,255,255,.8); margin-bottom:8px;">COLOR SCORE 🌈</div>
+    <h1 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:30px; font-weight:300; color:#fff; margin-bottom:8px;">색깔악보</h1>
+    <p style="font-size:14px; color:rgba(255,255,255,.9); line-height:1.6; max-width:440px;">음표를 색으로 표시해 악보를 처음 보는 분도 바로 연주할 수 있어요. 아이·입문자·칼림바 연주에 딱 맞는 악보입니다.</p>
+    <div style="display:flex; gap:8px; margin-top:18px; flex-wrap:wrap;">
+      <div style="background:rgba(255,255,255,.18); border-radius:10px; padding:8px 14px; font-size:12px; color:#fff;">🎯 음이름·색·계이름 표기</div>
+      <div style="background:rgba(255,255,255,.18); border-radius:10px; padding:8px 14px; font-size:12px; color:#fff;">👶 5세부터 OK</div>
+      <div style="background:rgba(255,255,255,.18); border-radius:10px; padding:8px 14px; font-size:12px; color:#fff;">🎵 칼림바·피아노·실로폰</div>
+    </div>
+  </div>
+  <div style="max-width:920px; margin:0 auto; padding:24px 16px 60px;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px;">
+      <sc-for list="{{ colorScores }}" as="c" hint-placeholder-count="6">
+        <div style="background:#fff; border:1px solid #E2E8F0; border-radius:14px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+          <div style="display:flex; gap:6px; margin-bottom:14px;">
+            <sc-for list="{{ c.palette }}" as="col" hint-placeholder-count="5">
+              <div style="flex:1; height:36px; border-radius:8px; background:{{ col }}; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.9); font-size:16px;">♪</div>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+            <div style="min-width:0;">
+              <div style="font-size:15px; font-weight:600; color:#0F172A; margin-bottom:2px;">{{ c.title }}</div>
+              <div style="font-size:12px; color:#64748B;">{{ c.artist }} · {{ c.level }}</div>
+            </div>
+            <span style="flex-shrink:0; background:#F1F5F9; color:#475569; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:600;">{{ c.level }}</span>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px;">
+            <span style="font-size:17px; font-weight:700; color:{{ c.payColor }};">{{ c.payStr }}</span>
+            <button onClick="{{ c.onAdd }}" style="background:#8B5CF6; color:#fff; border:none; border-radius:9px; padding:8px 16px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit;">담기</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ══════════ BAND SETS ══════════ -->
+<sc-if value="{{ isBandSet }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh; animation:ssFadeUp .3s ease;">
+  <div style="background:linear-gradient(135deg,#0F172A 0%,#334155 100%); padding:32px 24px 40px;">
+    <button onClick="{{ bandBack }}" style="background:rgba(255,255,255,.15); border:none; cursor:pointer; color:#fff; border-radius:8px; padding:6px 12px; font-size:18px; backdrop-filter:blur(8px); margin-bottom:18px;">←</button>
+    <div style="font-size:13px; font-weight:700; letter-spacing:.14em; color:rgba(255,255,255,.55); margin-bottom:8px;">BAND SET 🎸</div>
+    <h1 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:30px; font-weight:300; color:#fff; margin-bottom:8px;">밴드세트</h1>
+    <p style="font-size:14px; color:rgba(255,255,255,.75); line-height:1.6; max-width:440px;">보컬·기타·베이스·드럼·건반 파트 악보를 한 곡으로 묶었어요. 합주·밴드 연습용으로 낱장 구매보다 최대 30% 저렴합니다.</p>
+  </div>
+  <div style="max-width:720px; margin:0 auto; padding:24px 16px 60px;">
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <sc-for list="{{ bandSets }}" as="b" hint-placeholder-count="4">
+        <div style="background:#fff; border:1px solid #E2E8F0; border-radius:16px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+          <div style="display:flex; gap:14px; padding:16px;">
+            <div style="width:72px; height:72px; border-radius:12px; background:{{ b.grad }}; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.3); font-size:30px;">🎸</div>
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+                <span style="font-size:16px; font-weight:700; color:#0F172A;">{{ b.title }}</span>
+                <sc-if value="{{ b.isNew }}" hint-placeholder-val="{{ false }}"><span style="background:#1E293B; color:#fff; padding:1px 7px; border-radius:9999px; font-size:9px; font-weight:700;">NEW</span></sc-if>
+              </div>
+              <div style="font-size:12px; color:#64748B; margin-bottom:8px;">{{ b.artist }} · {{ b.partCount }}개 파트</div>
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                <sc-for list="{{ b.parts }}" as="p" hint-placeholder-count="4"><span style="background:#F1F5F9; color:#475569; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:500;">{{ p }}</span></sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#F8FAFC; border-top:1px solid #F1F5F9;">
+            <div style="display:flex; align-items:baseline; gap:8px;">
+              <span style="font-size:12px; color:#94A3B8; text-decoration:line-through;">{{ b.origStr }}</span>
+              <span style="font-size:20px; font-weight:700; color:#0F172A;">{{ b.priceStr }}</span>
+              <span style="background:#FEE2E2; color:#DC2626; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:700;">{{ b.saveStr }} 할인</span>
+            </div>
+            <button onClick="{{ b.onAdd }}" style="background:#F97316; color:#fff; border:none; border-radius:10px; padding:10px 20px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">세트 담기</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ══════════ ARRANGER PROFILE ══════════ -->
+<sc-if value="{{ isArranger }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh; animation:ssFadeUp .3s ease;">
+  <div style="background:{{ a_color }}; height:120px; position:relative;">
+    <button onClick="{{ a_back }}" style="position:absolute; top:16px; left:16px; background:rgba(255,255,255,.22); border:none; cursor:pointer; color:#fff; border-radius:8px; padding:6px 12px; font-size:18px; backdrop-filter:blur(8px);">←</button>
+  </div>
+  <div style="max-width:720px; margin:0 auto; padding:0 16px 60px;">
+    <div style="background:#fff; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-top:-44px; position:relative; box-shadow:0 4px 12px rgba(0,0,0,.08);">
+      <div style="display:flex; align-items:flex-end; gap:16px; margin-bottom:16px;">
+        <div style="width:80px; height:80px; border-radius:50%; background:{{ a_color }}; border:4px solid #fff; margin-top:-50px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:32px; font-weight:700; flex-shrink:0;">{{ a_initial }}</div>
+        <div style="flex:1; min-width:0; padding-bottom:2px;">
+          <div style="font-size:20px; font-weight:700; color:#0F172A;">{{ a_name }}</div>
+          <div style="font-size:13px; color:#94A3B8;">{{ a_specialty }}</div>
+        </div>
+        <button onClick="{{ a_onFollow }}" style="background:{{ a_followBg }}; color:{{ a_followFg }}; border:none; border-radius:10px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; flex-shrink:0;">{{ a_followLabel }}</button>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;">
+        <div style="text-align:center; background:#F8FAFC; border-radius:12px; padding:12px;">
+          <div style="font-size:20px; font-weight:700; color:#0F172A;">{{ a_scoreCount }}</div>
+          <div style="font-size:11px; color:#94A3B8; margin-top:2px;">등록 악보</div>
+        </div>
+        <div style="text-align:center; background:#F8FAFC; border-radius:12px; padding:12px;">
+          <div style="font-size:20px; font-weight:700; color:#F97316;">{{ a_followers }}</div>
+          <div style="font-size:11px; color:#94A3B8; margin-top:2px;">팔로워</div>
+        </div>
+        <div style="text-align:center; background:#F8FAFC; border-radius:12px; padding:12px;">
+          <div style="font-size:20px; font-weight:700; color:#FBBF24;">★ {{ a_avgDiff }}</div>
+          <div style="font-size:11px; color:#94A3B8; margin-top:2px;">평균 난이도</div>
+        </div>
+      </div>
+      <p style="font-size:13px; color:#475569; line-height:1.7;">{{ a_bio }}</p>
+    </div>
+
+    <div style="font-size:14px; font-weight:700; color:#334155; margin:24px 4px 12px;">🎼 {{ a_name }}님의 악보</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;">
+      <sc-for list="{{ a_scores }}" as="s" hint-placeholder-count="3">
+        <div onClick="{{ s.onSelect }}" style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+          <div style="position:relative; background:{{ s.grad }}; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center;">
+            <span style="font-size:48px; opacity:.15; color:#fff;">♪</span>
+            <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px; flex-wrap:wrap;">
+              <sc-for list="{{ s.badgeList }}" as="b" hint-placeholder-count="1"><span style="background:{{ b.bg }}; color:{{ b.fg }}; padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:700; line-height:1.6;">{{ b.text }}</span></sc-for>
+            </div>
+          </div>
+          <div style="padding:10px 12px 14px;">
+            <div style="font-size:13px; font-weight:600; color:#0F172A; line-height:1.35; margin-bottom:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ s.title }}</div>
+            <div style="font-size:11px; color:#64748B; margin-bottom:6px;">{{ s.artist }}</div>
+            <div style="display:flex; align-items:baseline; gap:5px; flex-wrap:wrap;">
+              <sc-if value="{{ s.hasDiscount }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px; color:#94A3B8; text-decoration:line-through;">{{ s.priceStr }}</span></sc-if>
+              <span style="font-size:15px; font-weight:700; color:{{ s.priceColor }};">{{ s.payStr }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ══════════ SEARCH ══════════ -->
+<sc-if value="{{ isSearch }}" hint-placeholder-val="{{ false }}">
+<div style="animation:ssFadeUp .3s ease;">
+  <div style="background:#fff; border-bottom:1px solid #E2E8F0; position:sticky; top:58px; z-index:20;">
+    <div style="max-width:1040px; margin:0 auto; padding:14px 16px 0;">
+      <div style="display:flex; align-items:center; gap:10px; background:#F1F5F9; border-radius:10px; padding:10px 14px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+        <input value="{{ q }}" onChange="{{ onQ }}" placeholder="곡명, 아티스트, 태그 검색..." style="flex:1; border:none; outline:none; background:none; font-size:15px; font-family:inherit; color:#0F172A;">
+        <button onClick="{{ onClearQ }}" style="background:none; border:none; cursor:pointer; color:#94A3B8; font-size:16px;">✕</button>
+      </div>
+      <div style="display:flex; gap:8px; overflow-x:auto; padding:12px 0 12px;" class="ss-scroll">
+        <sc-for list="{{ instrumentFacets }}" as="f" hint-placeholder-count="8">
+          <button onClick="{{ f.onClick }}" style="flex-shrink:0; background:{{ f.bg }}; color:{{ f.fg }}; border:1px solid {{ f.bd }}; border-radius:9999px; padding:6px 14px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">{{ f.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1040px; margin:0 auto; padding:16px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+      <div style="display:flex; align-items:baseline; gap:10px;">
+        <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:20px; font-weight:300; color:#0F172A;">{{ searchHeading }}</h2>
+        <span style="font-size:13px; color:#94A3B8;">{{ resultCount }}곡</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button onClick="{{ toggleFree }}" style="display:flex; align-items:center; gap:6px; background:{{ freeToggleBg }}; border:1px solid {{ freeToggleBd }}; color:{{ freeToggleFg }}; border-radius:9999px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">🎁 무료만</button>
+        <div style="display:flex; gap:10px;">
+          <sc-for list="{{ sortOptions }}" as="o" hint-placeholder-count="4">
+            <button onClick="{{ o.onClick }}" style="background:none; border:none; cursor:pointer; font-size:13px; color:{{ o.color }}; font-weight:{{ o.weight }}; font-family:inherit;">{{ o.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;">
+        <sc-for list="{{ results }}" as="s" hint-placeholder-count="8">
+          <div onClick="{{ s.onSelect }}" style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.06);">
+            <div style="position:relative; background:{{ s.grad }}; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:48px; opacity:.15; color:#fff;">♪</span>
+              <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px; flex-wrap:wrap;">
+                <sc-for list="{{ s.badgeList }}" as="b" hint-placeholder-count="1"><span style="background:{{ b.bg }}; color:{{ b.fg }}; padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:700; line-height:1.6;">{{ b.text }}</span></sc-for>
+              </div>
+              <button onClick="{{ s.onWish }}" style="position:absolute; top:8px; right:8px; background:none; border:none; cursor:pointer; color:{{ s.wishColor }}; font-size:18px; line-height:1;">{{ s.wishIcon }}</button>
+            </div>
+            <div style="padding:10px 12px 14px;">
+              <div style="font-size:13px; font-weight:600; color:#0F172A; line-height:1.35; margin-bottom:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ s.title }}</div>
+              <div style="font-size:11px; color:#64748B; margin-bottom:6px;">{{ s.artist }}</div>
+              <div style="font-size:13px; color:#FBBF24; letter-spacing:1px; margin-bottom:4px;">{{ s.stars }}</div>
+              <div style="display:flex; align-items:baseline; gap:5px; flex-wrap:wrap;">
+                <sc-if value="{{ s.hasDiscount }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px; color:#94A3B8; text-decoration:line-through;">{{ s.priceStr }}</span></sc-if>
+                <span style="font-size:15px; font-weight:700; color:{{ s.priceColor }};">{{ s.payStr }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; align-items:center; padding:70px 20px; text-align:center;">
+        <div style="font-size:48px; margin-bottom:12px;">🔍</div>
+        <div style="font-size:15px; color:#64748B; margin-bottom:16px;">조건에 맞는 악보가 없어요</div>
+        <button onClick="{{ onClearFilters }}" style="background:#F97316; color:#fff; border:none; border-radius:10px; padding:10px 20px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;">필터 초기화</button>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<!-- ══════════ DETAIL ══════════ -->
+<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+<div style="background:#F8FAFC; min-height:100vh; padding-bottom:90px; animation:ssFadeUp .3s ease;">
+  <div style="background:{{ d_grad }}; height:260px; display:flex; align-items:center; justify-content:center; position:relative;">
+    <span style="font-size:80px; opacity:.12; color:#fff;">♪</span>
+    <button onClick="{{ d_back }}" style="position:absolute; top:16px; left:16px; background:rgba(255,255,255,.15); border:none; cursor:pointer; color:#fff; border-radius:8px; padding:6px 12px; font-size:18px; backdrop-filter:blur(8px);">←</button>
+    <div style="position:absolute; bottom:16px; left:16px; display:flex; gap:6px;">
+      <sc-for list="{{ d_badges }}" as="b" hint-placeholder-count="1"><span style="background:{{ b.bg }}; color:{{ b.fg }}; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:700;">{{ b.text }}</span></sc-for>
+    </div>
+  </div>
+
+  <div style="max-width:640px; margin:0 auto; padding:0 16px;">
+    <div style="background:#fff; border-radius:16px; padding:20px; margin-top:-24px; box-shadow:0 4px 12px rgba(0,0,0,.08); position:relative; z-index:2;">
+      <div style="font-size:11px; font-weight:700; color:#94A3B8; letter-spacing:.06em; margin-bottom:4px;">{{ d_meta }}</div>
+      <h1 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:23px; font-weight:300; line-height:1.3; color:#0F172A; margin-bottom:8px;">{{ d_title }}</h1>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <span style="font-size:18px; color:#FBBF24; letter-spacing:2px;">{{ d_stars }}</span>
+        <span style="font-size:13px; color:#CBD5E1;">|</span>
+        <span style="font-size:16px; color:#334155; letter-spacing:2px;">{{ d_tech }}</span>
+      </div>
+      <div style="font-size:13px; color:#64748B; margin-bottom:14px;">아티스트 <strong style="color:#334155;">{{ d_artist }}</strong> · 편곡 <button onClick="{{ d_openArranger }}" style="background:none; border:none; padding:0; font:inherit; color:#F97316; font-weight:700; cursor:pointer; text-decoration:underline; text-underline-offset:2px;">{{ d_arranger }}</button></div>
+      <div style="display:flex; align-items:baseline; gap:8px;">
+        <sc-if value="{{ d_hasDiscount }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px; color:#94A3B8; text-decoration:line-through;">{{ d_priceStr }}</span></sc-if>
+        <span style="font-size:28px; font-weight:700; color:{{ d_payColor }};">{{ d_payStr }}</span>
+      </div>
+      <sc-if value="{{ d_canPts }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FEF3C7; border-radius:8px; padding:8px 12px; margin-top:12px; font-size:12px; color:#92400E;">◆ 포인트로 구매 가능 — 보유 {{ pointsLabel }}P</div>
+      </sc-if>
+    </div>
+
+    <div style="background:#fff; border-radius:12px; padding:14px 20px; margin-top:12px; display:flex; gap:8px; border:1px solid #E2E8F0;">
+      <sc-for list="{{ d_metrics }}" as="m" hint-placeholder-count="4">
+        <div style="text-align:center; flex:1;">
+          <div style="font-size:10px; font-weight:700; color:#94A3B8; letter-spacing:.06em; margin-bottom:3px;">{{ m.label }}</div>
+          <div style="font-size:14px; font-weight:600; color:#334155;">{{ m.value }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:#fff; border-radius:12px; padding:16px 20px; margin-top:12px; border:1px solid #E2E8F0;">
+      <div style="font-size:12px; font-weight:700; color:#94A3B8; margin-bottom:10px;">🎵 미리듣기 (30초)</div>
+      <div style="background:#F1F5F9; border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
+        <button style="background:#F97316; color:#fff; border:none; cursor:pointer; border-radius:50%; width:32px; height:32px; font-size:12px; display:flex; align-items:center; justify-content:center;">▶</button>
+        <div style="flex:1; height:4px; background:#E2E8F0; border-radius:2px;"><div style="width:30%; height:100%; background:#F97316; border-radius:2px;"></div></div>
+        <span style="font-size:11px; color:#64748B;">0:09 / 0:30</span>
+      </div>
+      <div style="font-size:12px; font-weight:700; color:#94A3B8; margin:16px 0 10px;">📄 샘플 미리보기</div>
+      <div style="background:#F8FAFC; border-radius:8px; height:160px; display:flex; align-items:center; justify-content:center; border:1px dashed #CBD5E1;">
+        <div style="text-align:center; color:#94A3B8;"><div style="font-size:30px; margin-bottom:4px;">♩ ♩ ♩ ♩</div><div style="font-size:12px;">워터마크 샘플 PDF (1p)</div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px; display:flex; gap:6px; flex-wrap:wrap;">
+      <sc-for list="{{ d_tags }}" as="t" hint-placeholder-count="3"><span style="background:#F1F5F9; color:#475569; padding:5px 12px; border-radius:9999px; font-size:12px;">#{{ t }}</span></sc-for>
+    </div>
+
+    <div style="margin-top:24px;">
+      <h3 style="font-size:15px; font-weight:600; color:#0F172A; margin-bottom:12px;">함께 연주하면 좋은 악보</h3>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px;">
+        <sc-for list="{{ d_related }}" as="s" hint-placeholder-count="4">
+          <div onClick="{{ s.onSelect }}" style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; cursor:pointer;">
+            <div style="background:{{ s.grad }}; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center;"><span style="font-size:36px; opacity:.15; color:#fff;">♪</span></div>
+            <div style="padding:8px 10px 12px;">
+              <div style="font-size:12px; font-weight:600; color:#0F172A; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:4px;">{{ s.title }}</div>
+              <span style="font-size:13px; font-weight:700; color:{{ s.priceColor }};">{{ s.payStr }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:fixed; bottom:0; left:0; right:0; background:#fff; padding:12px 16px; box-shadow:0 -4px 16px rgba(0,0,0,.08); display:flex; gap:8px; max-width:640px; margin:0 auto; z-index:30;">
+    <button onClick="{{ d_onWish }}" style="background:none; border:1.5px solid #E2E8F0; border-radius:10px; padding:0 16px; cursor:pointer; font-size:18px; color:{{ d_wishColor }};">{{ d_wishIcon }}</button>
+    <button onClick="{{ d_onCart }}" style="flex:1; background:#F1F5F9; color:#334155; border:none; border-radius:10px; padding:13px 0; cursor:pointer; font-family:inherit; font-weight:600; font-size:14px;">🛒 장바구니</button>
+    <button onClick="{{ d_onBuy }}" style="flex:1.2; background:#F97316; color:#fff; border:none; border-radius:10px; padding:13px 0; cursor:pointer; font-family:inherit; font-weight:700; font-size:14px;">바로구매</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ══════════ CART ══════════ -->
+<sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:560px; margin:0 auto; padding:20px 16px 40px; animation:ssFadeUp .3s ease;">
+  <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:22px; font-weight:300; color:#0F172A; margin-bottom:18px;">장바구니 <span style="font-size:16px; color:#F97316;">{{ cartCount }}</span></h2>
+  <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex; flex-direction:column; align-items:center; padding:60px 20px; text-align:center;">
+      <div style="font-size:52px; margin-bottom:12px; opacity:.6;">🛒</div>
+      <div style="font-size:15px; color:#64748B; margin-bottom:20px;">장바구니가 비어 있어요</div>
+      <button onClick="{{ goShopping }}" style="background:#F97316; color:#fff; border:none; border-radius:10px; padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">악보 둘러보기</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+      <sc-for list="{{ cartItems }}" as="s" hint-placeholder-count="2">
+        <div style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:12px; display:flex; gap:12px; align-items:center;">
+          <div style="width:54px; height:64px; border-radius:8px; background:{{ s.grad }}; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.3); font-size:22px;">♪</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:13px; font-weight:600; color:#0F172A; line-height:1.35; margin-bottom:3px;">{{ s.title }}</div>
+            <div style="font-size:11px; color:#64748B; margin-bottom:5px;">{{ s.artist }}</div>
+            <div style="display:flex; align-items:baseline; gap:5px;">
+              <sc-if value="{{ s.hasDiscount }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px; color:#94A3B8; text-decoration:line-through;">{{ s.priceStr }}</span></sc-if>
+              <span style="font-size:15px; font-weight:700; color:{{ s.priceColor }};">{{ s.payStr }}</span>
+            </div>
+          </div>
+          <button onClick="{{ s.onRemove }}" style="background:none; border:none; cursor:pointer; color:#CBD5E1; font-size:20px; padding:4px; align-self:flex-start;">✕</button>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:16px 20px; margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; font-size:14px; color:#64748B; margin-bottom:8px;"><span>상품 금액</span><span>{{ cartOrigStr }}</span></div>
+      <sc-if value="{{ cartHasSave }}" hint-placeholder-val="{{ false }}"><div style="display:flex; justify-content:space-between; font-size:14px; color:#F97316; margin-bottom:8px;"><span>할인</span><span>-{{ cartSaveStr }}</span></div></sc-if>
+      <div style="border-top:1px solid #F1F5F9; padding-top:10px; display:flex; justify-content:space-between; font-size:17px; font-weight:700; color:#0F172A;"><span>결제 예정</span><span>{{ cartTotalStr }}</span></div>
+    </div>
+    <button onClick="{{ onCheckoutCart }}" style="width:100%; background:#F97316; color:#fff; border:none; border-radius:12px; padding:16px 0; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit;">{{ cartTotalStr }} 결제하기</button>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ══════════ CHECKOUT ══════════ -->
+<sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:480px; margin:0 auto; padding:20px 16px 40px; min-height:100vh; animation:ssFadeUp .3s ease;">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+    <button onClick="{{ coBack }}" style="background:none; border:none; cursor:pointer; color:#64748B; font-size:20px; padding:4px;">←</button>
+    <h2 style="font-size:20px; font-weight:700; color:#0F172A;">결제하기</h2>
+  </div>
+  <div style="background:#fff; border-radius:12px; padding:16px 20px; margin-bottom:12px; border:1px solid #E2E8F0;">
+    <div style="font-size:12px; font-weight:700; color:#94A3B8; margin-bottom:10px;">주문 상품 {{ coCount }}건</div>
+    <sc-for list="{{ coItems }}" as="s" hint-placeholder-count="1">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0;">
+        <span style="font-size:13px; color:#334155; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:10px;">{{ s.title }}</span>
+        <span style="font-size:14px; font-weight:600; color:#0F172A; flex-shrink:0;">{{ s.payStr }}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="background:#fff; border-radius:12px; padding:16px 20px; margin-bottom:12px; border:1px solid #E2E8F0;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <div style="font-size:12px; font-weight:700; color:#94A3B8;">포인트 사용</div>
+      <span style="font-size:12px; color:#64748B;">보유 {{ coBalance }}P</span>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <input type="number" value="{{ coPointsUsed }}" onChange="{{ onPointsInput }}" style="flex:1; border:1.5px solid #E2E8F0; border-radius:8px; padding:9px 12px; font-size:14px; font-family:inherit; outline:none;">
+      <button onClick="{{ onUseAllPoints }}" style="background:#FFF7ED; color:#F97316; border:1.5px solid #F97316; border-radius:8px; padding:9px 14px; cursor:pointer; font-family:inherit; font-weight:600; font-size:13px; white-space:nowrap;">전액사용</button>
+    </div>
+  </div>
+  <div style="background:#fff; border-radius:12px; padding:16px 20px; margin-bottom:20px; border:1px solid #E2E8F0;">
+    <div style="display:flex; justify-content:space-between; font-size:14px; color:#64748B; margin-bottom:6px;"><span>상품 금액</span><span>{{ coTotalStr }}</span></div>
+    <sc-if value="{{ coHasPoints }}" hint-placeholder-val="{{ false }}"><div style="display:flex; justify-content:space-between; font-size:14px; color:#F97316; margin-bottom:6px;"><span>포인트 할인</span><span>-{{ coPointsStr }}P</span></div></sc-if>
+    <div style="border-top:1px solid #F1F5F9; padding-top:10px; display:flex; justify-content:space-between; font-size:17px; font-weight:700; color:#0F172A;"><span>최종 결제</span><span>{{ coRemainStr }}</span></div>
+  </div>
+  <button onClick="{{ onPay }}" style="width:100%; background:{{ coBtnBg }}; color:{{ coBtnFg }}; border:none; border-radius:12px; padding:16px 0; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit;">{{ coBtnLabel }}</button>
+  <p style="font-size:11px; color:#94A3B8; text-align:center; margin-top:12px; line-height:1.6;">결제 시 이용약관 및 환불 정책에 동의하게 됩니다.<br>디지털 상품 특성상 다운로드 후 환불이 제한됩니다.</p>
+</div>
+</sc-if>
+
+<!-- ══════════ COMPLETE ══════════ -->
+<sc-if value="{{ isComplete }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:480px; margin:0 auto; padding:64px 24px; text-align:center; min-height:100vh; animation:ssPop .4s ease;">
+  <div style="font-size:64px; margin-bottom:16px;">🎉</div>
+  <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:25px; font-weight:300; color:#0F172A; margin-bottom:8px;">결제 완료!</h2>
+  <p style="font-size:14px; color:#64748B; margin-bottom:4px;">{{ orderTitle }}</p>
+  <p style="font-size:13px; color:#94A3B8; margin-bottom:24px;">주문번호 <span style="font-family:'JetBrains Mono',monospace;">{{ orderNo }}</span></p>
+  <div style="background:#FEF3C7; border-radius:12px; padding:14px 20px; margin-bottom:24px; font-size:14px; color:#92400E; font-weight:600;">◆ {{ orderEarn }} 포인트 적립 완료!</div>
+  <button style="width:100%; background:#F97316; color:#fff; border:none; border-radius:12px; padding:14px 0; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; margin-bottom:10px;">📄 악보 다운로드</button>
+  <button onClick="{{ onCompleteLib }}" style="width:100%; background:#fff; color:#334155; border:1px solid #E2E8F0; border-radius:12px; padding:14px 0; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; margin-bottom:10px;">보관함에서 보기</button>
+  <button onClick="{{ onCompleteHome }}" style="width:100%; background:none; color:#94A3B8; border:none; padding:8px 0; font-size:14px; font-weight:500; cursor:pointer; font-family:inherit;">홈으로 돌아가기</button>
+</div>
+</sc-if>
+
+<!-- ══════════ POINTS CHARGE ══════════ -->
+<sc-if value="{{ isPoints }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:480px; margin:0 auto; padding:20px 16px 60px; animation:ssFadeUp .3s ease;">
+  <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+    <button onClick="{{ pBack }}" style="background:none; border:none; cursor:pointer; color:#64748B; font-size:20px; padding:4px;">←</button>
+    <h2 style="font-size:20px; font-weight:700; color:#0F172A;">포인트 충전</h2>
+  </div>
+  <div style="background:linear-gradient(135deg,#0F172A,#1E293B); border-radius:16px; padding:22px 24px; margin-bottom:22px; color:#fff;">
+    <div style="font-size:11px; font-weight:600; color:rgba(255,255,255,.5); letter-spacing:.06em; margin-bottom:6px;">보유 포인트</div>
+    <div style="font-size:38px; font-weight:700; color:#FBBF24; margin-bottom:2px;">{{ pBalance }} P</div>
+    <div style="font-size:12px; color:rgba(255,255,255,.4);">유효기간 2027.04.18까지</div>
+  </div>
+  <div style="font-size:12px; font-weight:700; color:#94A3B8; letter-spacing:.06em; margin-bottom:10px;">충전 패키지</div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:22px;">
+    <sc-for list="{{ pointPackages }}" as="p" hint-placeholder-count="4">
+      <button onClick="{{ p.onClick }}" style="background:{{ p.bg }}; border:2px solid {{ p.bd }}; border-radius:12px; padding:16px 12px; cursor:pointer; text-align:center; font-family:inherit; position:relative; overflow:hidden;">
+        <sc-if value="{{ p.hot }}" hint-placeholder-val="{{ false }}"><div style="position:absolute; top:0; right:0; background:#EF4444; color:#fff; font-size:9px; font-weight:700; padding:2px 8px; border-radius:0 10px 0 8px;">🔥 BEST</div></sc-if>
+        <div style="font-size:19px; font-weight:700; color:#0F172A; margin-bottom:3px;">{{ p.amountStr }}P</div>
+        <div style="font-size:13px; color:#64748B; margin-bottom:4px;">{{ p.wonStr }}</div>
+        <div style="font-size:11px; font-weight:700; color:{{ p.bonusColor }};">{{ p.bonusStr }}</div>
+      </button>
+    </sc-for>
+  </div>
+  <div style="background:#fff; border-radius:12px; padding:16px 20px; margin-bottom:16px; border:1px solid #E2E8F0;">
+    <div style="display:flex; justify-content:space-between; font-size:14px; color:#64748B; margin-bottom:8px;"><span>결제 금액</span><span style="font-weight:600; color:#0F172A;">{{ pPayAmtStr }}</span></div>
+    <sc-if value="{{ pHasBonus }}" hint-placeholder-val="{{ false }}"><div style="display:flex; justify-content:space-between; font-size:14px; color:#F97316; margin-bottom:8px;"><span>보너스</span><span style="font-weight:600;">{{ pBonusStr }}</span></div></sc-if>
+    <div style="border-top:1px solid #F1F5F9; padding-top:10px; display:flex; justify-content:space-between; font-size:16px; font-weight:700; color:#0F172A;"><span>충전 후 잔액</span><span style="color:#FBBF24;">{{ pAfterStr }}P</span></div>
+  </div>
+  <div style="font-size:12px; font-weight:700; color:#94A3B8; letter-spacing:.06em; margin-bottom:10px;">결제 수단</div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:22px;">
+    <sc-for list="{{ pPayMethods }}" as="m" hint-placeholder-count="4">
+      <button onClick="{{ m.onClick }}" style="padding:11px 0; border:2px solid {{ m.bd }}; border-radius:10px; background:{{ m.bg }}; cursor:pointer; font-family:inherit; font-size:13px; font-weight:500; color:#334155;">{{ m.label }}</button>
+    </sc-for>
+  </div>
+  <button onClick="{{ onCharge }}" style="width:100%; background:#F97316; color:#fff; border:none; border-radius:12px; padding:16px 0; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit;">{{ pChargeBtn }}</button>
+  <p style="font-size:11px; color:#94A3B8; text-align:center; margin-top:12px; line-height:1.6;">포인트는 충전일로부터 1년간 유효하며, 현금 환불이 불가합니다.</p>
+</div>
+</sc-if>
+
+<!-- ══════════ MY PAGE ══════════ -->
+<sc-if value="{{ isMypage }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:560px; margin:0 auto; padding:20px 16px 40px; animation:ssFadeUp .3s ease;">
+  <div style="background:#fff; border:1px solid #E2E8F0; border-radius:16px; padding:20px; margin-bottom:16px; display:flex; align-items:center; gap:16px;">
+    <div style="width:56px; height:56px; border-radius:50%; background:linear-gradient(145deg,#F97316,#EA6A0A); display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px; font-weight:700; flex-shrink:0;">{{ userInitial }}</div>
+    <div style="flex:1; min-width:0;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:17px; font-weight:700; color:#0F172A;">{{ userName }}</span>
+        <span style="background:#FEF3C7; color:#92400E; padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:700;">{{ userGrade }}</span>
+      </div>
+      <div style="font-size:12px; color:#94A3B8; margin-top:2px;">{{ userEmail }} · 가입 {{ userJoin }}</div>
+    </div>
+    <button onClick="{{ onLogout }}" style="background:none; border:1px solid #E2E8F0; border-radius:8px; padding:6px 12px; font-size:12px; color:#64748B; cursor:pointer; font-family:inherit;">로그아웃</button>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;">
+    <div style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center;">
+      <div style="font-size:22px; font-weight:700; color:#0F172A;">{{ statsPurchased }}</div>
+      <div style="font-size:11px; color:#94A3B8; margin-top:2px;">구매 악보</div>
+    </div>
+    <div style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:14px; text-align:center;">
+      <div style="font-size:22px; font-weight:700; color:#EF4444;">{{ statsWish }}</div>
+      <div style="font-size:11px; color:#94A3B8; margin-top:2px;">위시리스트</div>
+    </div>
+    <button onClick="{{ goCharge }}" style="background:linear-gradient(135deg,#FBBF24,#F59E0B); border:none; border-radius:12px; padding:14px; text-align:center; cursor:pointer; font-family:inherit;">
+      <div style="font-size:18px; font-weight:700; color:#fff;">{{ mypageBalance }}P</div>
+      <div style="font-size:11px; color:rgba(255,255,255,.85); margin-top:2px;">충전하기 →</div>
+    </button>
+  </div>
+
+  <div style="font-size:13px; font-weight:700; color:#334155; margin:20px 4px 10px;">📚 내 보관함</div>
+  <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:24px;">
+    <sc-for list="{{ libraryItems }}" as="s" hint-placeholder-count="4">
+      <div onClick="{{ s.onSelect }}" style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; padding:12px; display:flex; gap:12px; align-items:center; cursor:pointer;">
+        <div style="width:46px; height:54px; border-radius:8px; background:{{ s.grad }}; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.3); font-size:20px;">♪</div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:#0F172A; line-height:1.35; margin-bottom:3px;">{{ s.title }}</div>
+          <div style="font-size:11px; color:#94A3B8;">구매일 {{ s.date }}</div>
+        </div>
+        <button style="background:#FFF7ED; color:#F97316; border:1px solid #FED7AA; border-radius:8px; padding:7px 12px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; flex-shrink:0;">↓ PDF</button>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="font-size:13px; font-weight:700; color:#334155; margin:0 4px 10px;">◆ 포인트 내역</div>
+  <div style="background:#fff; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden;">
+    <sc-for list="{{ pointHistory }}" as="h" hint-placeholder-count="4">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:13px 16px; border-bottom:1px solid #F1F5F9;">
+        <div>
+          <div style="font-size:13px; color:#334155;">{{ h.label }}</div>
+          <div style="font-size:11px; color:#CBD5E1; margin-top:1px;">{{ h.date }}</div>
+        </div>
+        <span style="font-size:14px; font-weight:700; color:{{ h.color }};">{{ h.amt }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <button onClick="{{ goAdmin }}" style="width:100%; margin-top:20px; background:none; border:1px dashed #CBD5E1; border-radius:10px; padding:12px 0; font-size:13px; color:#94A3B8; cursor:pointer; font-family:inherit;">🛠 판매자/관리자 대시보드 →</button>
+</div>
+</sc-if>
+
+<!-- ══════════ NOTIFICATIONS ══════════ -->
+<sc-if value="{{ isNotif }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:560px; margin:0 auto; padding:20px 16px 40px; animation:ssFadeUp .3s ease;">
+  <h2 style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:22px; font-weight:300; color:#0F172A; margin-bottom:18px;">알림</h2>
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <sc-for list="{{ notifList }}" as="n" hint-placeholder-count="5">
+      <div style="background:{{ n.cardBg }}; border:1px solid #E2E8F0; border-radius:12px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start;">
+        <div style="font-size:22px; flex-shrink:0;">{{ n.ic }}</div>
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:3px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:{{ n.dotBg }}; flex-shrink:0;"></span>
+            <span style="font-size:14px; font-weight:600; color:#0F172A;">{{ n.title }}</span>
+          </div>
+          <div style="font-size:13px; color:#64748B; line-height:1.5;">{{ n.body }}</div>
+          <div style="font-size:11px; color:#CBD5E1; margin-top:5px;">{{ n.time }}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<!-- ══════════ LOGIN ══════════ -->
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; background:#F8FAFC; animation:ssFadeUp .3s ease;">
+  <div style="display:flex; align-items:center; gap:5px; margin-bottom:8px;">
+    <span style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:32px; font-weight:300; color:#F97316;">Score</span>
+    <span style="font-family:'MaruBuri','Noto Serif KR',serif; font-size:32px; font-weight:300; color:#0F172A;">Store</span>
+    <span style="color:#F97316; font-size:26px;">♪</span>
+  </div>
+  <p style="font-size:14px; color:#94A3B8; margin-bottom:36px;">디지털 악보, 한 곡부터 가볍게</p>
+  <div style="width:100%; max-width:360px;">
+    <input placeholder="이메일" style="width:100%; border:1.5px solid #E2E8F0; border-radius:10px; padding:13px 16px; font-size:15px; font-family:inherit; outline:none; margin-bottom:10px;">
+    <input type="password" placeholder="비밀번호" style="width:100%; border:1.5px solid #E2E8F0; border-radius:10px; padding:13px 16px; font-size:15px; font-family:inherit; outline:none; margin-bottom:16px;">
+    <button onClick="{{ onEmailLogin }}" style="width:100%; background:#F97316; color:#fff; border:none; border-radius:10px; padding:14px 0; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; margin-bottom:12px;">로그인</button>
+    <div style="display:flex; align-items:center; gap:12px; margin:14px 0; color:#CBD5E1; font-size:12px;"><div style="flex:1; height:1px; background:#E2E8F0;"></div>또는<div style="flex:1; height:1px; background:#E2E8F0;"></div></div>
+    <button onClick="{{ onKakaoLogin }}" style="width:100%; background:#FEE500; color:#3C1E1E; border:none; border-radius:10px; padding:14px 0; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; margin-bottom:10px;">💬 카카오로 시작하기</button>
+    <button onClick="{{ onSkipLogin }}" style="width:100%; background:none; border:none; color:#94A3B8; padding:10px 0; font-size:14px; cursor:pointer; font-family:inherit;">둘러보기로 계속 →</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ══════════ ADMIN ══════════ -->
+<sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh; background:#0F172A; animation:ssFadeUp .3s ease;">
+  <div style="max-width:980px; margin:0 auto; padding:20px 20px 40px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="color:#fff; font-size:18px; font-weight:700;">🛠 판매자 대시보드</span>
+      </div>
+      <button onClick="{{ adminBack }}" style="background:rgba(255,255,255,.1); border:none; color:#fff; border-radius:8px; padding:8px 14px; font-size:13px; cursor:pointer; font-family:inherit;">← 스토어로</button>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:24px;">
+      <sc-for list="{{ adminStats }}" as="s" hint-placeholder-count="4">
+        <div style="background:#1E293B; border:1px solid #334155; border-radius:14px; padding:18px 20px;">
+          <div style="font-size:12px; color:#94A3B8; margin-bottom:8px;">{{ s.label }}</div>
+          <div style="font-size:26px; font-weight:700; color:#fff; margin-bottom:6px;">{{ s.value }}</div>
+          <div style="font-size:12px; font-weight:600; color:{{ s.deltaColor }};">{{ s.delta }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:#1E293B; border:1px solid #334155; border-radius:14px; overflow:hidden;">
+      <div style="padding:16px 20px; border-bottom:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:14px; font-weight:700; color:#fff;">악보 관리</span>
+        <button style="background:#F97316; border:none; color:#fff; border-radius:8px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;">+ 새 악보 등록</button>
+      </div>
+      <div style="overflow-x:auto;" class="ss-scroll">
+        <div style="min-width:560px;">
+          <div style="display:grid; grid-template-columns:2.5fr 1fr 1fr 0.8fr 0.8fr; padding:10px 20px; font-size:11px; font-weight:700; color:#64748B; border-bottom:1px solid #334155;">
+            <span>악보</span><span>악기</span><span>가격</span><span>판매</span><span>상태</span>
+          </div>
+          <sc-for list="{{ adminRows }}" as="r" hint-placeholder-count="8">
+            <div style="display:grid; grid-template-columns:2.5fr 1fr 1fr 0.8fr 0.8fr; padding:13px 20px; font-size:13px; color:#CBD5E1; border-bottom:1px solid #1E293B; align-items:center;">
+              <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-right:10px;">{{ r.title }}</span>
+              <span style="color:#94A3B8;">{{ r.instrument }}</span>
+              <span style="color:#fff; font-weight:600;">{{ r.priceStr }}</span>
+              <span style="color:#94A3B8;">{{ r.sales }}</span>
+              <span><span style="background:{{ r.statusBg }}; color:{{ r.statusFg }}; padding:2px 8px; border-radius:9999px; font-size:10px; font-weight:700;">{{ r.status }}</span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+</div>
+
+<!-- ══════════ BOTTOM TAB BAR (mobile) ══════════ -->
+<sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ true }}">
+<nav class="ss-m" style="position:sticky; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #E2E8F0; display:flex; z-index:40;">
+  <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+    <button onClick="{{ t.onClick }}" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 0 11px; background:none; border:none; cursor:pointer; color:{{ t.color }}; position:relative; font-family:inherit;">
+      <div style="position:relative;" innerHTML="{{ t.icon }}"></div>
+      <sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:4px; left:calc(50% + 6px); background:#EF4444; color:#fff; border-radius:50%; min-width:15px; height:15px; padding:0 3px; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff;">{{ t.badge }}</span></sc-if>
+      <span style="font-size:10px; font-weight:{{ t.weight }};">{{ t.label }}</span>
+    </button>
+  </sc-for>
+</nav>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:820}}">
+class Component extends DCLogic {
+  state = {
+    page: 'home',
+    selectedId: null,
+    cart: [],
+    wish: [],
+    points: 12300,
+    loggedIn: false,
+    heroIdx: 0,
+    // search
+    q: '', fInstrument: '전체', fGenre: '전체', fPrice: 'all', sort: 'popular', onlyFree: false,
+    // checkout
+    pointsUsed: 0, lastOrder: null, checkoutIds: [],
+    // points charge
+    pkgIdx: 1, payMethod: 'card',
+    // notifications
+    notifRead: false,
+    catFilter: null,
+    selArranger: '김민수', followed: [],
+  };
+
+  GRADS = ['linear-gradient(145deg,#1E293B,#334155)','linear-gradient(145deg,#7C3AED,#4F46E5)','linear-gradient(145deg,#065F46,#059669)','linear-gradient(145deg,#991B1B,#DC2626)','linear-gradient(145deg,#1E3A5F,#2563EB)','linear-gradient(145deg,#312E81,#6366F1)','linear-gradient(145deg,#0F766E,#14B8A6)','linear-gradient(145deg,#9A3412,#EA580C)'];
+
+  SCORES = [
+    { id:1, title:'기타) 한로로 - 사랑하게 될거야', artist:'한로로', instrument:'통기타', genre:'K-POP', difficulty:2, technique:2, price:2400, isNew:true, arranger:'김민수', key:'G장조', bpm:88, pages:4, tags:['K-POP','발라드','통기타'], plays:18200 },
+    { id:2, title:'베이스) 검정치마 - Antifreeze', artist:'검정치마', instrument:'베이스', genre:'인디', difficulty:3, technique:3, price:2900, discountPrice:1990, arranger:'이정훈', key:'C장조', bpm:120, pages:5, tags:['인디','베이스','모던록'], plays:9400 },
+    { id:3, title:'[무료] 임형주 - 천 개의 바람이 되어', artist:'임형주', instrument:'통기타', genre:'클래식', difficulty:1, technique:1, price:0, isFree:true, arranger:'편집부', key:'D장조', bpm:72, pages:3, tags:['클래식','무료','통기타'], plays:24100 },
+    { id:4, title:'기타) AKMU - 소문의 낙원', artist:'AKMU', instrument:'일렉기타', genre:'K-POP', difficulty:3, technique:2, price:2400, grad:4, arranger:'박서연', key:'A장조', bpm:96, pages:5, tags:['K-POP','일렉기타'], plays:15600 },
+    { id:5, title:'드럼) 뉴진스 - Hype Boy', artist:'뉴진스', instrument:'드럼', genre:'K-POP', difficulty:2, technique:2, price:2900, isNew:true, grad:3, arranger:'정우진', key:'-', bpm:100, pages:4, tags:['K-POP','드럼'], plays:21800 },
+    { id:6, title:'기타) 아이유 - 밤편지', artist:'아이유', instrument:'통기타', genre:'K-POP', difficulty:2, technique:1, price:2400, grad:7, arranger:'김민수', key:'C장조', bpm:74, pages:4, tags:['K-POP','발라드'], plays:30200 },
+    { id:7, title:'피아노) 쇼팽 - 야상곡 Op.9 No.2', artist:'쇼팽', instrument:'피아노', genre:'클래식', difficulty:4, technique:5, price:2900, grad:0, arranger:'편집부', key:'Eb장조', bpm:60, pages:6, tags:['클래식','피아노'], plays:12700 },
+    { id:8, title:'기타) 빌리 - Ring x Ring', artist:'빌리', instrument:'통기타', genre:'K-POP', difficulty:2, technique:2, price:2400, discountPrice:1900, isNew:true, grad:5, arranger:'박서연', key:'G장조', bpm:128, pages:4, tags:['K-POP','통기타'], plays:8800 },
+    { id:9, title:'우쿨렐레) 잔나비 - 주저하는 연인들을 위해', artist:'잔나비', instrument:'우쿨렐레', genre:'인디', difficulty:2, technique:2, price:2200, grad:2, arranger:'이정훈', key:'C장조', bpm:90, pages:3, tags:['인디','우쿨렐레'], plays:11200 },
+    { id:10, title:'[무료] 캐논 변주곡 (이지버전)', artist:'파헬벨', instrument:'피아노', genre:'클래식', difficulty:2, technique:2, price:0, isFree:true, grad:1, arranger:'편집부', key:'D장조', bpm:64, pages:2, tags:['클래식','무료','피아노'], plays:33400 },
+    { id:11, title:'베이스) 새소년 - 난춤', artist:'새소년', instrument:'베이스', genre:'인디', difficulty:3, technique:4, price:2900, grad:6, isNew:true, arranger:'정우진', key:'E단조', bpm:112, pages:5, tags:['인디','베이스'], plays:6700 },
+    { id:12, title:'드럼) IVE - I AM', artist:'IVE', instrument:'드럼', genre:'K-POP', difficulty:3, technique:3, price:2900, discountPrice:2400, grad:3, arranger:'정우진', key:'-', bpm:118, pages:5, tags:['K-POP','드럼'], plays:17300 },
+    { id:13, title:'기타) 데이식스 - 한 페이지가 될 수 있게', artist:'DAY6', instrument:'일렉기타', genre:'K-POP', difficulty:3, technique:3, price:2400, grad:4, arranger:'박서연', key:'F장조', bpm:132, pages:5, tags:['K-POP','일렉기타','밴드'], plays:19900 },
+    { id:14, title:'칼림바) 지브리 - 인생의 회전목마', artist:'히사이시 조', instrument:'칼림바', genre:'클래식', difficulty:1, technique:1, price:2200, grad:2, arranger:'편집부', key:'C장조', bpm:80, pages:2, tags:['OST','칼림바'], plays:14500 },
+  ];
+  BUNDLES = [
+    { id:'b1', type:'bundle', title:'통기타 SEASON2 악보집', subtitle:'10곡 수록 · 통기타', price:24000, discountPrice:18000, grad:4 },
+    { id:'b2', type:'bundle', title:'통기타 SEASON1 악보집', subtitle:'5곡 수록 · 통기타', price:12000, discountPrice:9000, grad:2 },
+    { id:'b3', type:'bundle', title:'K-POP 드럼 베스트', subtitle:'8곡 수록 · 드럼', price:20000, discountPrice:14900, grad:3 },
+  ];
+  INSTRUMENTS = [['멜로디','🎵'],['피아노','🎹'],['통기타','🎸'],['일렉기타','⚡'],['베이스','🎸'],['우쿨렐레','🪕'],['드럼','🥁'],['칼림바','🎵'],['하모니카','🎶'],['오카리나','🎵'],['팬플룻','🪈'],['색깔악보','🌈']];
+  SIDEBAR = [['바이올린','🎻'],['첼로','🎻'],['플룻','🪈'],['클라리넷','🎵'],['오보에','🎵'],['트럼펫','🎺'],['트럼본','🎺'],['색소폰','🎷'],['호른','📯'],['바순','🎵'],['튜바','🎺']];
+  HEROES = [
+    { bg:'linear-gradient(135deg,#0F172A 0%,#1E3A5F 100%)', kicker:'THIS MONTH', title:'이달의 신곡 업데이트', sub:'매주 새로운 악보가 추가됩니다', btn:'신곡 보기', go:'search' },
+    { bg:'linear-gradient(135deg,#7C3AED 0%,#4F46E5 100%)', kicker:'BUNDLE', title:'통기타 SEASON2 악보집', sub:'10곡 수록 · ₩18,000', btn:'악보집 보기', go:'search' },
+    { bg:'linear-gradient(135deg,#065F46 0%,#059669 100%)', kicker:'EVENT', title:'🎁 무료악보 이벤트', sub:'회원가입 시 악보 1곡 무료 증정', btn:'무료악보 받기', go:'free' },
+  ];
+
+  USER = { name:'김도윤', email:'doyun.kim@email.com', joinDate:'2024.11.02', grade:'GOLD' };
+  POINT_PACKAGES = [ {amount:10000,bonus:0}, {amount:30000,bonus:3000}, {amount:50000,bonus:7500,hot:true}, {amount:100000,bonus:20000,hot:true} ];
+  PAY_METHODS = [ ['card','💳 카드'], ['kakao','🟡 카카오페이'], ['naver','🟢 네이버페이'], ['toss','🔵 토스'] ];
+  NOTIFS = [
+    { ic:'🔥', title:'위시리스트 할인 시작!', body:'검정치마 - Antifreeze 악보가 31% 할인 중이에요.', time:'방금 전', unread:true },
+    { ic:'🎁', title:'포인트 적립 완료', body:'결제 적립 +72P가 지급되었습니다.', time:'2시간 전', unread:true },
+    { ic:'🆕', title:'새 악보 업데이트', body:'팔로우한 편곡자 박서연님이 새 악보 3곡을 등록했어요.', time:'어제', unread:true },
+    { ic:'📚', title:'악보집 출시 안내', body:'통기타 SEASON2 악보집이 출시되었습니다.', time:'3일 전', unread:false },
+    { ic:'⏰', title:'포인트 만료 예정', body:'1,200P가 30일 후 만료됩니다. 미리 사용해 보세요.', time:'5일 전', unread:false },
+  ];
+  LIBRARY = [
+    { id:6, date:'2025.04.18', orderNo:'20250418-004821' },
+    { id:3, date:'2025.04.10', orderNo:'20250410-003120' },
+    { id:1, date:'2025.03.28', orderNo:'20250328-002044' },
+    { id:10, date:'2025.03.15', orderNo:'20250315-001533' },
+  ];
+  POINT_HISTORY = [
+    { label:'결제 적립 — 밤편지', amt:'+72P', date:'04.18', pos:true },
+    { label:'포인트 결제 — 캐논 변주곡', amt:'-2,400P', date:'04.10', pos:false },
+    { label:'포인트 충전 (+보너스 3,000P)', amt:'+33,000P', date:'04.02', pos:true },
+    { label:'회원가입 축하 포인트', amt:'+1,000P', date:'2024.11.02', pos:true },
+  ];
+
+  ARRANGERS = [
+    { name:'김민수', specialty:'통기타 · 핑거스타일', bio:'10년차 통기타 편곡자. 원곡의 감성을 살린 통기타 핑거스타일 편곡을 추구합니다. 입문자도 칠 수 있는 쉬운 버전부터 정교한 카피까지.', followers:3240, color:'linear-gradient(145deg,#F97316,#EA6A0A)' },
+    { name:'이정훈', specialty:'베이스 · 밴드', bio:'밴드 출신 베이시스트. 그루브가 살아있는 베이스 라인과 합주용 밴드 스코어를 전문으로 합니다.', followers:1890, color:'linear-gradient(145deg,#4F46E5,#6366F1)' },
+    { name:'박서연', specialty:'일렉기타 · 리드', bio:'K-POP·밴드 일렉기타 편곡 전문. 톤 세팅 가이드와 함께 제공하는 디테일한 채보로 유명합니다.', followers:2710, color:'linear-gradient(145deg,#059669,#10B981)' },
+    { name:'정우진', specialty:'드럼 · 리듬', bio:'세션 드러머이자 채보가. 정확한 리듬 표기와 필인 디테일로 드럼 카피의 기준을 제시합니다.', followers:4120, color:'linear-gradient(145deg,#DC2626,#EF4444)' },
+    { name:'편집부', specialty:'클래식 · 무료악보', bio:'ScoreStore 공식 편집부. 검증된 클래식·동요·무료 악보를 정기적으로 업데이트합니다.', followers:980, color:'linear-gradient(145deg,#475569,#64748B)' },
+  ];
+  COLOR_SCORES = [
+    { id:'cs1', title:'반짝반짝 작은 별', artist:'동요', level:'입문', price:1500, palette:['#EF4444','#F59E0B','#FBBF24','#10B981','#3B82F6'] },
+    { id:'cs2', title:'곰 세 마리', artist:'동요', level:'입문', price:1500, palette:['#F97316','#FBBF24','#10B981','#3B82F6','#8B5CF6'] },
+    { id:'cs3', title:'아기 상어', artist:'핑크퐁', level:'입문', price:1800, isNew:true, palette:['#3B82F6','#06B6D4','#10B981','#FBBF24','#EF4444'] },
+    { id:'cs4', title:'인생의 회전목마', artist:'지브리', level:'초급', price:2200, palette:['#8B5CF6','#EC4899','#F59E0B','#10B981','#3B82F6'] },
+    { id:'cs5', title:'캐논 변주곡', artist:'파헬벨', level:'초급', price:0, isFree:true, palette:['#EF4444','#F97316','#FBBF24','#10B981','#3B82F6'] },
+    { id:'cs6', title:'밤편지', artist:'아이유', level:'초급', price:2200, palette:['#EC4899','#F59E0B','#10B981','#06B6D4','#6366F1'] },
+  ];
+  BAND_SETS = [
+    { id:'bs1', title:'한 페이지가 될 수 있게', artist:'DAY6', parts:['보컬','일렉기타','베이스','드럼','키보드'], price:9900, orig:14500, grad:4 },
+    { id:'bs2', title:'사건의 지평선', artist:'윤하', parts:['보컬','일렉기타','베이스','드럼'], price:8900, orig:11600, grad:5, isNew:true },
+    { id:'bs3', title:'주저하는 연인들을 위해', artist:'잔나비', parts:['보컬','통기타','베이스','드럼','건반'], price:9900, orig:14500, grad:2 },
+    { id:'bs4', title:'밤하늘의 별을', artist:'경서', parts:['보컬','통기타','베이스','드럼'], price:7900, orig:10400, grad:6 },
+  ];
+
+  componentDidMount() {
+    this._t = setInterval(() => this.setState(s => ({ heroIdx: (s.heroIdx + 1) % 3 })), 4500);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  nav(p) { this.setState({ page: p }); try { window.scrollTo(0,0); } catch(e){} }
+  grad(s) { return s.grad != null ? this.GRADS[s.grad] : this.GRADS[(s.id*1) % this.GRADS.length]; }
+  won(n) { return '₩' + (n||0).toLocaleString(); }
+  stars(n) { return '★'.repeat(n) + '☆'.repeat(5-n); }
+  toggleWish(id) { this.setState(s => ({ wish: s.wish.includes(id) ? s.wish.filter(x=>x!==id) : [...s.wish, id] })); }
+  addCart(id) { this.setState(s => ({ cart: s.cart.includes(id) ? s.cart : [...s.cart, id] })); }
+
+  badgeList(s) {
+    const b = [];
+    if (s.isFree) b.push({ text:'무료', bg:'#D1FAE5', fg:'#059669' });
+    if (s.isNew) b.push({ text:'NEW', bg:'#1E293B', fg:'#fff' });
+    if (s.discountPrice && !s.isFree) b.push({ text:'SALE', bg:'#FEE2E2', fg:'#DC2626' });
+    return b;
+  }
+
+  decorate(s) {
+    const wished = this.state.wish.includes(s.id);
+    return {
+      ...s,
+      grad: this.grad(s),
+      stars: this.stars(s.difficulty || 3),
+      badgeList: this.badgeList(s),
+      wished,
+      wishIcon: wished ? '♥' : '♡',
+      wishColor: wished ? '#EF4444' : 'rgba(255,255,255,.75)',
+      hasDiscount: !!s.discountPrice && !s.isFree,
+      priceStr: this.won(s.price),
+      payStr: s.isFree ? '무료' : this.won(s.discountPrice || s.price),
+      priceColor: s.isFree ? '#10B981' : (s.discountPrice ? '#EF4444' : '#0F172A'),
+      onSelect: () => this.setState({ selectedId: s.id, page: 'detail' }, () => { try{window.scrollTo(0,0);}catch(e){} }),
+      onWish: (e) => { if(e&&e.stopPropagation)e.stopPropagation(); this.toggleWish(s.id); },
+      onAddCart: (e) => { if(e&&e.stopPropagation)e.stopPropagation(); this.addCart(s.id); },
+    };
+  }
+
+  icon(name, active) {
+    const sw = active ? 2.5 : 1.8;
+    const p = {
+      home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+      search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
+      cart:'<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>',
+      notif:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+      mypage:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    }[name];
+    return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  }
+
+  getFiltered() {
+    const st = this.state;
+    let r = this.SCORES.slice();
+    if (st.onlyFree) r = r.filter(s => s.isFree);
+    if (st.fInstrument && st.fInstrument !== '전체') r = r.filter(s => s.instrument === st.fInstrument);
+    if (st.fGenre && st.fGenre !== '전체') r = r.filter(s => s.genre === st.fGenre);
+    if (st.fPrice === 'under2000') r = r.filter(s => (s.discountPrice||s.price) < 2000 && !s.isFree);
+    if (st.fPrice === 'free') r = r.filter(s => s.isFree);
+    if (st.q.trim()) { const q = st.q.trim().toLowerCase(); r = r.filter(s => (s.title+s.artist+(s.tags||[]).join('')).toLowerCase().includes(q)); }
+    if (st.sort === 'popular') r.sort((a,b)=>b.plays-a.plays);
+    else if (st.sort === 'priceLow') r.sort((a,b)=>(a.discountPrice||a.price)-(b.discountPrice||b.price));
+    else if (st.sort === 'priceHigh') r.sort((a,b)=>(b.discountPrice||b.price)-(a.discountPrice||a.price));
+    else if (st.sort === 'new') r.sort((a,b)=>(b.isNew?1:0)-(a.isNew?1:0));
+    return r;
+  }
+
+  cartObjs() { return this.state.cart.map(id => this.SCORES.find(s=>s.id===id)).filter(Boolean); }
+  cartTotal() { return this.cartObjs().reduce((t,s)=>t+(s.discountPrice||s.price||0),0); }
+  cartOrig() { return this.cartObjs().reduce((t,s)=>t+(s.price||0),0); }
+
+  renderVals() {
+    const st = this.state;
+    const page = st.page;
+    const hero = this.HEROES[st.heroIdx];
+    const cartCount = st.cart.length;
+
+    const navDefs = [
+      ['통기타','통기타'],['일렉기타','일렉기타'],['드럼','드럼'],['피아노','피아노'],['무료악보','free'],['포인트충전','points'],
+    ];
+    const navItems = navDefs.map(([label,key]) => ({
+      label,
+      onClick: () => key==='free' ? this.setState({ page:'search', onlyFree:true, fInstrument:'전체', q:'' }) : key==='points' ? this.nav('points') : this.setState({ page:'search', fInstrument: key, onlyFree:false, q:'' }),
+      color: key==='points' ? '#F97316' : '#334155',
+      bg: 'transparent',
+    }));
+
+    return {
+      // chrome
+      showHeader: !['checkout','complete','login','admin'].includes(page),
+      showBottomNav: !['checkout','complete','login','admin'].includes(page),
+      isHome: page==='home',
+      pointsLabel: st.points.toLocaleString(),
+      authLabel: st.loggedIn ? '내정보' : '로그인',
+      onAuthBtn: () => this.nav(st.loggedIn ? 'mypage' : 'login'),
+      hasUnread: !st.notifRead,
+      hasCart: cartCount > 0,
+      cartCount,
+      navItems,
+      goHome: () => this.nav('home'),
+      goSearch: () => this.setState({ page:'search' }),
+      goCart: () => this.nav('cart'),
+      goNotif: () => this.setState({ page:'notif', notifRead:true }),
+      goPoints: () => this.nav('points'),
+      goFree: () => this.setState({ page:'search', onlyFree:true, fInstrument:'전체' }),
+
+      // hero
+      heroBg: hero.bg, heroKicker: hero.kicker, heroTitle: hero.title, heroSub: hero.sub, heroBtn: hero.btn,
+      heroCta: () => this.nav(hero.go),
+      heroDots: this.HEROES.map((_,i) => ({ w: i===st.heroIdx ? '20px':'6px', bg: i===st.heroIdx ? '#F97316':'rgba(255,255,255,.4)' })),
+
+      // catalog
+      instruments: this.INSTRUMENTS.map(([label,emoji]) => ({ label, emoji, onClick: () => label==='색깔악보' ? this.nav('colorscore') : this.setState({ page:'search', fInstrument:label, onlyFree:false, q:'' }) })),
+      sidebarInstruments: this.SIDEBAR.map(([label,emoji]) => ({ label, emoji, onClick: () => this.setState({ page:'search', fInstrument:label, q:'' }) })),
+      freeScores: this.SCORES.filter(s=>s.isFree).map(s=>this.decorate(s)),
+      newScores: this.SCORES.filter(s=>s.isNew).map(s=>this.decorate(s)),
+      topScores: [...this.SCORES].sort((a,b)=>b.plays-a.plays).slice(0,6).map((s,i)=>({ ...this.decorate(s), rank:i+1, rankColor: i<3?'#F97316':'#94A3B8' })),
+      bundles: this.BUNDLES.map(b=>({ ...b, grad:this.GRADS[b.grad], priceStr:this.won(b.price), payStr:this.won(b.discountPrice), onSelect:()=>this.nav('home') })),
+
+      // bottom tabs
+      tabs: [
+        { key:'home', label:'홈', icon:this.icon('home', page==='home') },
+        { key:'search', label:'검색', icon:this.icon('search', page==='search') },
+        { key:'cart', label:'장바구니', icon:this.icon('cart', page==='cart'), badge:cartCount, hasBadge:cartCount>0 },
+        { key:'notif', label:'알림', icon:this.icon('notif', page==='notif'), badge:'', hasBadge:false },
+        { key:'mypage', label:'마이', icon:this.icon('mypage', page==='mypage') },
+      ].map(t => ({
+        ...t,
+        color: page===t.key ? '#F97316' : '#94A3B8',
+        weight: page===t.key ? 600 : 500,
+        onClick: () => t.key==='notif' ? this.setState({ page:'notif', notifRead:true }) : this.nav(t.key),
+      })),
+
+      // ── SEARCH ──
+      isSearch: page==='search',
+      q: st.q,
+      onQ: (e) => this.setState({ q: e.target.value }),
+      onClearQ: () => this.setState({ q:'' }),
+      searchHeading: st.q.trim() ? `'${st.q.trim()}' 검색결과` : (st.onlyFree ? '무료 악보' : (st.fInstrument!=='전체' ? st.fInstrument : '전체 악보')),
+      results: this.getFiltered().map(s=>this.decorate(s)),
+      resultCount: this.getFiltered().length,
+      hasResults: this.getFiltered().length>0,
+      isEmpty: this.getFiltered().length===0,
+      instrumentFacets: ['전체','통기타','일렉기타','베이스','드럼','피아노','우쿨렐레','칼림바'].map(l=>({ label:l, active: st.fInstrument===l, bg: st.fInstrument===l?'#0F172A':'#fff', fg: st.fInstrument===l?'#fff':'#475569', bd: st.fInstrument===l?'#0F172A':'#E2E8F0', onClick:()=>this.setState({ fInstrument:l }) })),
+      genreFacets: ['전체','K-POP','인디','클래식'].map(l=>({ label:l, active: st.fGenre===l, bg: st.fGenre===l?'#FFF7ED':'#fff', fg: st.fGenre===l?'#F97316':'#475569', bd: st.fGenre===l?'#F97316':'#E2E8F0', onClick:()=>this.setState({ fGenre:l }) })),
+      sortOptions: [['popular','인기순'],['new','신곡순'],['priceLow','낮은가격'],['priceHigh','높은가격']].map(([k,l])=>({ label:l, active: st.sort===k, color: st.sort===k?'#F97316':'#94A3B8', weight: st.sort===k?700:500, onClick:()=>this.setState({ sort:k }) })),
+      onlyFreeOn: st.onlyFree,
+      freeToggleBg: st.onlyFree?'#ECFDF5':'#fff', freeToggleBd: st.onlyFree?'#10B981':'#E2E8F0', freeToggleFg: st.onlyFree?'#059669':'#64748B',
+      toggleFree: () => this.setState(s=>({ onlyFree: !s.onlyFree })),
+      onClearFilters: () => this.setState({ fInstrument:'전체', fGenre:'전체', onlyFree:false, q:'', sort:'popular' }),
+
+      // ── DETAIL ──
+      isDetail: page==='detail',
+      ...this.detailVals(),
+
+      // ── CART ──
+      isCart: page==='cart',
+      cartItems: this.cartObjs().map(s=>({ ...this.decorate(s), onRemove:()=>this.setState(x=>({ cart:x.cart.filter(c=>c!==s.id) })) })),
+      cartEmpty: this.state.cart.length===0,
+      cartTotalStr: this.won(this.cartTotal()),
+      cartOrigStr: this.won(this.cartOrig()),
+      cartSaveStr: this.won(this.cartOrig()-this.cartTotal()),
+      cartHasSave: (this.cartOrig()-this.cartTotal())>0,
+      onCheckoutCart: () => this.setState({ page:'checkout', checkoutIds: this.state.cart.slice(), pointsUsed:0 }),
+      goShopping: () => this.nav('home'),
+
+      // ── CHECKOUT / COMPLETE ──
+      ...this.checkoutVals(),
+      isComplete: page==='complete',
+      orderTitle: st.lastOrder ? st.lastOrder.title : '',
+      orderNo: st.lastOrder ? st.lastOrder.no : '',
+      orderEarn: st.lastOrder ? st.lastOrder.earn : '',
+      onCompleteHome: () => this.setState({ page:'home', cart:[], checkoutIds:[] }),
+      onCompleteLib: () => this.setState({ page:'mypage', cart:[], checkoutIds:[] }),
+
+      // ── POINTS ──
+      ...this.pointVals(),
+
+      // ── MYPAGE ──
+      isMypage: page==='mypage',
+      userName: this.USER.name, userEmail: this.USER.email, userJoin: this.USER.joinDate, userGrade: this.USER.grade,
+      mypageBalance: st.points.toLocaleString(),
+      userInitial: this.USER.name.charAt(0),
+      statsPurchased: this.LIBRARY.length,
+      statsWish: st.wish.length,
+      libraryItems: this.LIBRARY.map(l=>({ ...this.decorate(this.SCORES.find(s=>s.id===l.id)), date:l.date, orderNo:l.orderNo })),
+      pointHistory: this.POINT_HISTORY.map(h=>({ ...h, color: h.pos?'#10B981':'#EF4444' })),
+      onLogout: () => this.setState({ loggedIn:false, page:'home' }),
+      goCharge: () => this.nav('points'),
+
+      // ── LOGIN ──
+      isLogin: page==='login',
+      onKakaoLogin: () => this.setState({ loggedIn:true, page:'mypage' }),
+      onEmailLogin: () => this.setState({ loggedIn:true, page:'mypage' }),
+      onSkipLogin: () => this.nav('home'),
+
+      // ── NOTIF ──
+      isNotif: page==='notif',
+      notifList: this.NOTIFS.map(n=>({ ...n, dotBg: n.unread?'#F97316':'transparent', cardBg: n.unread?'#FFF7ED':'#fff' })),
+
+      // ── ADMIN ──
+      isAdmin: page==='admin',
+      ...this.adminVals(),
+      goAdmin: () => this.nav('admin'),
+
+      // ── HOME entry points ──
+      catPromos: [
+        { label:'색깔악보', sub:'색으로 배우는 첫 악보 🌈', bg:'linear-gradient(135deg,#EC4899 0%,#8B5CF6 50%,#3B82F6 100%)', emoji:'🌈', onClick:()=>this.nav('colorscore') },
+        { label:'밴드세트', sub:'합주용 파트 악보 한 번에', bg:'linear-gradient(135deg,#0F172A 0%,#334155 100%)', emoji:'🎸', onClick:()=>this.nav('bandset') },
+      ],
+      popularArrangers: this.ARRANGERS.map(a=>({ name:a.name, specialty:a.specialty, color:a.color, initial:a.name.charAt(0), count: this.SCORES.filter(s=>s.arranger===a.name).length, onClick:()=>this.setState({ page:'arranger', selArranger:a.name }) })),
+
+      // ── COLOR SCORES ──
+      isColorScore: page==='colorscore',
+      colorScores: this.COLOR_SCORES.map(c=>({ ...c, payStr: c.isFree?'무료':this.won(c.price), payColor: c.isFree?'#10B981':'#0F172A', onAdd:()=>this.addCart(c.id) })),
+      colorBack: () => this.nav('home'),
+
+      // ── BAND SETS ──
+      isBandSet: page==='bandset',
+      bandSets: this.BAND_SETS.map(b=>({ ...b, grad:this.GRADS[b.grad], priceStr:this.won(b.price), origStr:this.won(b.orig), saveStr:this.won(b.orig-b.price), partCount:b.parts.length, isNew:!!b.isNew, onAdd:()=>this.addCart(b.id) })),
+      bandBack: () => this.nav('home'),
+
+      // ── ARRANGER PROFILE ──
+      isArranger: page==='arranger',
+      ...this.arrangerVals(),
+    };
+  }
+
+  arrangerVals() {
+    const st = this.state;
+    const a = this.ARRANGERS.find(x=>x.name===st.selArranger) || this.ARRANGERS[0];
+    const scores = this.SCORES.filter(s=>s.arranger===a.name);
+    const isFollowed = st.followed.includes(a.name);
+    return {
+      a_name: a.name, a_specialty: a.specialty, a_bio: a.bio, a_color: a.color, a_initial: a.name.charAt(0),
+      a_followers: (a.followers + (isFollowed?1:0)).toLocaleString(),
+      a_scoreCount: scores.length,
+      a_avgDiff: scores.length ? (scores.reduce((t,s)=>t+s.difficulty,0)/scores.length).toFixed(1) : '0',
+      a_scores: scores.map(s=>this.decorate(s)),
+      a_hasScores: scores.length>0,
+      a_followLabel: isFollowed ? '팔로잉' : '+ 팔로우',
+      a_followBg: isFollowed ? '#F1F5F9' : '#F97316', a_followFg: isFollowed ? '#64748B' : '#fff',
+      a_onFollow: () => this.setState(s=>({ followed: s.followed.includes(a.name) ? s.followed.filter(n=>n!==a.name) : [...s.followed, a.name] })),
+      a_back: () => this.nav('home'),
+    };
+  }
+
+  detailVals() {
+    const st = this.state;
+    const raw = this.SCORES.find(s=>s.id===st.selectedId) || this.SCORES[0];
+    const s = this.decorate(raw);
+    const pay = raw.discountPrice || raw.price || 0;
+    const canPts = !raw.isFree && st.points >= pay;
+    return {
+      d_title: raw.title, d_artist: raw.artist, d_arranger: raw.arranger, d_grad: s.grad,
+      d_meta: `${raw.instrument} · ${raw.genre}`,
+      d_stars: this.stars(raw.difficulty||3),
+      d_tech: '●'.repeat(raw.technique||2) + '○'.repeat(5-(raw.technique||2)),
+      d_isFree: !!raw.isFree, d_hasDiscount: !!raw.discountPrice && !raw.isFree,
+      d_priceStr: this.won(raw.price), d_payStr: raw.isFree?'무료':this.won(pay),
+      d_payColor: raw.isFree?'#10B981':'#0F172A',
+      d_badges: this.badgeList(raw),
+      d_metrics: [ {label:'조성',value:raw.key||'-'}, {label:'BPM',value:String(raw.bpm||'-')}, {label:'페이지',value:(raw.pages||4)+'p'}, {label:'형식',value:'TAB+표준'} ],
+      d_tags: raw.tags||[],
+      d_canPts: canPts,
+      d_wishIcon: s.wished?'♥':'♡', d_wishColor: s.wished?'#EF4444':'#94A3B8',
+      d_onWish: () => this.toggleWish(raw.id),
+      d_onCart: () => this.addCart(raw.id),
+      d_onBuy: () => this.setState({ page:'checkout', checkoutIds:[raw.id], pointsUsed:0 }),
+      d_back: () => this.nav('home'),
+      d_openArranger: () => this.setState({ page:'arranger', selArranger: raw.arranger }),
+      d_related: this.SCORES.filter(x=>x.instrument===raw.instrument && x.id!==raw.id).slice(0,4).map(x=>this.decorate(x)),
+    };
+  }
+
+  checkoutVals() {
+    const st = this.state;
+    const ids = st.checkoutIds.length ? st.checkoutIds : st.cart;
+    const items = ids.map(id=>this.SCORES.find(s=>s.id===id)).filter(Boolean);
+    const total = items.reduce((t,s)=>t+(s.discountPrice||s.price||0),0);
+    const used = Math.min(st.pointsUsed, st.points, total);
+    const remain = Math.max(0, total - used);
+    return {
+      isCheckout: st.page==='checkout',
+      coItems: items.map(s=>this.decorate(s)),
+      coCount: items.length,
+      coTotalStr: this.won(total),
+      coBalance: st.points.toLocaleString(),
+      coPointsUsed: used,
+      coHasPoints: used > 0,
+      coPointsStr: used.toLocaleString(),
+      onPointsInput: (e) => this.setState({ pointsUsed: Math.max(0, Math.min(st.points, total, Number(e.target.value)||0)) }),
+      onUseAllPoints: () => this.setState({ pointsUsed: Math.min(st.points, total) }),
+      coRemain: remain, coRemainStr: this.won(remain),
+      coBtnLabel: remain===0 ? '◆ 포인트로 결제' : `${this.won(remain)} 결제하기`,
+      coBtnBg: remain===0 ? '#FBBF24' : '#F97316', coBtnFg: remain===0 ? '#92400E' : '#fff',
+      coBack: () => this.nav(st.cart.length && !st.checkoutIds.length ? 'cart' : 'detail'),
+      onPay: () => {
+        const earn = Math.round(remain*0.03);
+        this.setState({ page:'complete', lastOrder:{ title: items[0]?items[0].title:'악보', no:'20250423-00'+Math.floor(1000+Math.random()*8999), earn:'+'+earn+'P' }, points: st.points - used + earn });
+      },
+    };
+  }
+
+  pointVals() {
+    const st = this.state;
+    const pkg = this.POINT_PACKAGES[st.pkgIdx];
+    const total = pkg.amount + pkg.bonus;
+    return {
+      isPoints: st.page==='points',
+      pBalance: st.points.toLocaleString(),
+      pointPackages: this.POINT_PACKAGES.map((p,i)=>{ const pct=Math.round((p.bonus/p.amount)*100); const sel=st.pkgIdx===i; return { amountStr:p.amount.toLocaleString(), wonStr:this.won(p.amount), bonusStr:p.bonus>0?`+${p.bonus.toLocaleString()}P 보너스 (${pct}%)`:'보너스 없음', bonusColor:p.bonus>0?'#F97316':'#CBD5E1', hot:!!p.hot, bg:sel?'#FFF7ED':'#fff', bd:sel?'#F97316':'#E2E8F0', onClick:()=>this.setState({ pkgIdx:i }) }; }),
+      pPayMethods: this.PAY_METHODS.map(([k,l])=>({ label:l, active:st.payMethod===k, bg:st.payMethod===k?'#FFF7ED':'#fff', bd:st.payMethod===k?'#F97316':'#E2E8F0', onClick:()=>this.setState({ payMethod:k }) })),
+      pPayAmtStr: this.won(pkg.amount),
+      pBonusStr: pkg.bonus>0?`+${pkg.bonus.toLocaleString()}P`:'',
+      pHasBonus: pkg.bonus>0,
+      pAfterStr: (st.points+total).toLocaleString(),
+      pChargeBtn: `${this.won(pkg.amount)} 충전하기`,
+      onCharge: () => this.setState({ points: st.points+total, page:'mypage' }),
+      pBack: () => this.nav('home'),
+    };
+  }
+
+  adminVals() {
+    return {
+      adminStats: [
+        { label:'오늘 매출', value:'₩1,284,000', delta:'+12.4%', up:true },
+        { label:'판매 악보', value:'342건', delta:'+28건', up:true },
+        { label:'신규 회원', value:'89명', delta:'+5.1%', up:true },
+        { label:'환불 요청', value:'3건', delta:'-2건', up:false },
+      ].map(s=>({ ...s, deltaColor: s.up?'#10B981':'#F59E0B' })),
+      adminRows: this.SCORES.slice(0,8).map(s=>({ title:s.title, artist:s.artist, instrument:s.instrument, priceStr: s.isFree?'무료':this.won(s.discountPrice||s.price), sales: (s.plays/100|0)+'건', status: s.isNew?'신규':'판매중', statusBg: s.isNew?'#E0E7FF':'#D1FAE5', statusFg: s.isNew?'#4F46E5':'#059669' })),
+      adminBack: () => this.nav('home'),
+    };
+  }
+}
+</script>
+</body>
+</html>
