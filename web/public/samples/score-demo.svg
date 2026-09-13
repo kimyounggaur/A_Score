@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1000" viewBox="0 0 768 1000" role="img" aria-labelledby="title desc">
+  <title id="title">데모 악보 첫 페이지</title>
+  <desc id="desc">오선과 음표 위에 데모 워터마크가 표시된 샘플 이미지</desc>
+  <rect width="768" height="1000" fill="#fffdf9"/>
+  <rect x="32" y="32" width="704" height="936" rx="12" fill="none" stroke="#d6d3d1" stroke-width="3"/>
+  <text x="384" y="105" text-anchor="middle" font-family="serif" font-size="34" font-weight="700" fill="#292524">ScoreStore Sample</text>
+  <text x="384" y="145" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#78716c">기보 형식과 난이도 확인용</text>
+  <g stroke="#57534e" stroke-width="2">
+    <path d="M80 245H688M80 265H688M80 285H688M80 305H688M80 325H688"/>
+    <path d="M80 455H688M80 475H688M80 495H688M80 515H688M80 535H688"/>
+    <path d="M80 665H688M80 685H688M80 705H688M80 725H688M80 745H688"/>
+  </g>
+  <g fill="#292524" stroke="#292524" stroke-width="4">
+    <ellipse cx="190" cy="285" rx="13" ry="9"/><path d="M201 285V220"/>
+    <ellipse cx="285" cy="305" rx="13" ry="9"/><path d="M296 305V240"/>
+    <ellipse cx="405" cy="265" rx="13" ry="9"/><path d="M416 265V200"/>
+    <ellipse cx="540" cy="325" rx="13" ry="9"/><path d="M551 325V260"/>
+    <ellipse cx="220" cy="495" rx="13" ry="9"/><path d="M231 495V430"/>
+    <ellipse cx="365" cy="475" rx="13" ry="9"/><path d="M376 475V410"/>
+    <ellipse cx="500" cy="515" rx="13" ry="9"/><path d="M511 515V450"/>
+    <ellipse cx="235" cy="705" rx="13" ry="9"/><path d="M246 705V640"/>
+    <ellipse cx="420" cy="685" rx="13" ry="9"/><path d="M431 685V620"/>
+    <ellipse cx="570" cy="725" rx="13" ry="9"/><path d="M581 725V660"/>
+  </g>
+  <g transform="rotate(-28 384 500)">
+    <rect x="100" y="435" width="568" height="110" rx="18" fill="#c2410c" opacity=".9"/>
+    <text x="384" y="505" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="800" letter-spacing="8" fill="white">DEMO · 미리보기</text>
+  </g>
+  <text x="384" y="910" text-anchor="middle" font-family="sans-serif" font-size="17" fill="#78716c">실제 판매 파일이 아닌 UI 검증용 샘플입니다.</text>
+</svg>

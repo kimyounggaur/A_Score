@@ -2,13 +2,22 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ScoreStore — 디지털 악보 마켓</title>
+<meta name="description" content="통기타·일렉기타·베이스·드럼·피아노·칼림바 악보를 한 곡씩 구매하는 디지털 악보 마켓 (UI 데모)">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="ScoreStore — 디지털 악보 마켓">
+<meta property="og:description" content="악기별 악보를 한 곡부터 가볍게. UI 데모 버전이에요.">
+<meta property="og:url" content="https://kimyounggaur.github.io/A_Score/">
+<meta name="theme-color" content="#F97316">
+<link rel="canonical" href="https://kimyounggaur.github.io/A_Score/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F97316'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='white'%3E%E2%99%AA%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Noto+Serif+KR:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <style>
 /* ============================================================
@@ -17,7 +26,7 @@
 
 @font-face {
   font-family: 'MaruBuri';
-  src: url('fonts/MaruBuri-Light.otf') format('opentype');
+  src: url('ui_kits/scorestore/fonts/MaruBuri-Light.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -80,6 +89,11 @@
   --accent:         var(--color-orange-500);
   --accent-hover:   var(--color-orange-600);
   --accent-subtle:  var(--color-orange-50);
+  --accent-strong:  #C2410C;
+  --ink-muted:      #64748B;
+  --free-ink:       #047857;
+  --sale-ink:       #DC2626;
+  --point-ink:      #78350F;
 
   --point-bg:      var(--color-amber-100);
   --point-text:    #92400E;
@@ -157,6 +171,8 @@
   --transition-fast:   150ms ease-out;
   --transition-base:   200ms ease-out;
   --transition-slow:   300ms ease-out;
+
+  --tabbar-h: 56px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -212,7 +228,7 @@ code  { font-family: var(--font-mono); font-size: var(--text-sm); background: va
 .badge-sale    { background: var(--color-red-100); color: var(--color-red-600); }
 .badge-bundle  { background: var(--color-indigo-100); color: var(--color-indigo-600); }
 .badge-new     { background: var(--color-slate-800); color: white; }
-.badge-point   { background: var(--color-amber-100); color: #92400E; }
+.badge-point   { background: var(--color-amber-100); color: var(--point-ink); }
 
 .card {
   background: var(--bg-surface);
@@ -224,38 +240,134 @@ code  { font-family: var(--font-mono); font-size: var(--text-sm); background: va
 }
 .card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 
-@media (max-width: 768px) { .desktop-nav { display: none !important; } }
+:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: fixed; top: 8px; left: 8px; z-index: 9999; transform: translateY(-160%);
+  background: var(--color-slate-900); color: white; padding: 10px 14px;
+  border-radius: var(--radius-sm); text-decoration: none;
+}
+.skip-link:focus { transform: translateY(0); }
+.detail-cta { bottom: 0 !important; } /* 기존 고정 bottom:56 인라인 값을 데스크톱 화면 바닥으로 보정 */
+.detail-page { padding-bottom: 96px !important; } /* 마지막 콘텐츠가 고정 구매바에 가리지 않도록 보정 */
+.mobile-extra-instruments { display: none !important; }
+.demo-footer { color: var(--ink-muted); font-size: var(--text-xs); text-align: center; padding: 24px 16px 88px; }
+.toast-status {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 200;
+  max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: var(--radius-full);
+  background: var(--color-slate-900); color: white; font-size: var(--text-sm);
+  box-shadow: var(--shadow-lg); white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .desktop-nav, .hdr-desktop-only, .desktop-instrument-sidebar { display: none !important; }
+  .mobile-extra-instruments { display: contents !important; }
+  .detail-cta { bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)) !important; } /* 모바일 탭바와 구매바의 겹침 방지 */
+  .detail-page { padding-bottom: calc(164px + env(safe-area-inset-bottom)) !important; } /* 구매바와 탭바 높이를 함께 확보 */
+  .toast-status { bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
 </style>
 </head>
 <body>
+<a href="#main" class="skip-link" onClick="event.preventDefault(); document.getElementById('main')?.focus();">본문 바로가기</a>
+<noscript>이 사이트는 JavaScript가 필요해요.</noscript>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
+
+try { localStorage.removeItem('ss_page'); } catch (e) {}
+
+function parseHash() {
+  const raw = window.location.hash.replace(/^#\/?/, '');
+  const [name = '', encodedParam = null] = raw.split('/');
+  let param = null;
+  try { param = encodedParam ? decodeURIComponent(encodedParam) : null; } catch (e) {}
+  return { name: name || 'home', param };
+}
+
+function useHashRoute() {
+  const [route, setRoute] = useState(parseHash);
+  useEffect(() => {
+    const onChange = () => { setRoute(parseHash()); window.scrollTo(0, 0); };
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+  return route;
+}
+
+const go = (path) => {
+  const next = path.startsWith('/') ? path : '/' + path;
+  if (window.location.hash === '#' + next) window.scrollTo(0, 0);
+  else window.location.hash = next;
+};
+
+function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = (event) => setMatches(event.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query]);
+  return matches;
+}
+
+const won = (n) => '₩' + new Intl.NumberFormat('ko-KR').format(Number(n) || 0);
+const discountRate = (price, sale) =>
+  (sale != null && price > 0 && sale < price) ? Math.floor(((price - sale) * 100) / price) : 0;
+const clampPoints = (value, balance, payable) => {
+  const n = Math.floor(Number(value));
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.min(n, Math.max(0, balance), Math.max(0, payable));
+};
+
+function createOrderNo() {
+  const kst = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).format(new Date()).replaceAll('-', '');
+  const rand = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
+  return `${kst}-${rand}`;
+}
+
+function historyBackOrHome() {
+  if (history.length > 1) history.back();
+  else go('/');
+}
+
+window.__ssNavigate = go;
 
 /* ─── BottomTabBar ────────────────────────────────────────── */
-function BottomTabBar({ currentPage, onNavigate, cartCount = 2, notifCount = 3 }) {
+function BottomTabBar({ currentPage, cartCount = 0, notifCount = 0 }) {
   const tabs = [
-    { key: 'home', label: '홈', icon: (active) => (
+    { key: 'home', href: '#/', label: '홈', icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
       </svg>
     )},
-    { key: 'search', label: '검색', icon: (active) => (
+    { key: 'search', href: '#/search', label: '검색', icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
     )},
-    { key: 'cart', label: '장바구니', badge: cartCount, icon: (active) => (
+    { key: 'cart', href: '#/cart', label: '장바구니', badge: cartCount, icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
       </svg>
     )},
-    { key: 'notifications', label: '알림', badge: notifCount, icon: (active) => (
+    { key: 'notifications', href: '#/notifications', label: '알림', badge: notifCount, icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
       </svg>
     )},
-    { key: 'mypage', label: '마이', icon: (active) => (
+    { key: 'mypage', href: '#/mypage', label: '마이', icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
       </svg>
@@ -267,16 +379,17 @@ function BottomTabBar({ currentPage, onNavigate, cartCount = 2, notifCount = 3 }
       position: 'fixed', bottom: 0, left: 0, right: 0,
       background: '#FFFFFF', borderTop: '1px solid #E2E8F0',
       display: 'flex', zIndex: 40,
+      height: 'calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px))',
       paddingBottom: 'env(safe-area-inset-bottom, 0px)'
     }}>
       {tabs.map(tab => {
         const active = currentPage === tab.key;
         return (
-          <button key={tab.key} onClick={() => onNavigate(tab.key)} style={{
+          <a key={tab.key} href={tab.href} aria-current={active ? 'page' : undefined} aria-label={tab.badge ? `${tab.label}, ${tab.badge}개` : tab.label} style={{
             flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            padding: '8px 0 10px', background: 'none', border: 'none', cursor: 'pointer',
-            color: active ? '#F97316' : '#94A3B8', position: 'relative',
-            fontFamily: 'inherit', transition: 'color 150ms'
+            height: 'var(--tabbar-h)', justifyContent: 'center', padding: 0, background: 'none', border: 'none', cursor: 'pointer',
+            color: active ? 'var(--accent-strong)' : 'var(--ink-muted)', position: 'relative',
+            fontFamily: 'inherit', textDecoration: 'none', transition: 'color 150ms'
           }}>
             <div style={{ position: 'relative' }}>
               {tab.icon(active)}
@@ -292,7 +405,7 @@ function BottomTabBar({ currentPage, onNavigate, cartCount = 2, notifCount = 3 }
               )}
             </div>
             <span style={{ fontSize: 10, fontWeight: active ? 600 : 500 }}>{tab.label}</span>
-          </button>
+          </a>
         );
       })}
     </nav>
@@ -300,18 +413,37 @@ function BottomTabBar({ currentPage, onNavigate, cartCount = 2, notifCount = 3 }
 }
 
 /* ─── Header ─────────────────────────────────────────────── */
-function Header({ currentPage, onNavigate, cartCount = 2, notifCount = 3, pointBalance = 12300 }) {
+function Header({ currentPage, cartCount = 0, notifCount = 0, demoUser, onLogout }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const searchButtonRef = useRef(null);
 
   const navItems = [
-    { label: '기타', key: 'category-guitar' },
-    { label: '베이스', key: 'category-bass' },
-    { label: '드럼', key: 'category-drums' },
-    { label: '악보집', key: 'bundles' },
-    { label: '무료악보', key: 'free' },
-    { label: '포인트충전', key: 'points', accent: true },
+    { label: '기타', key: 'category-acoustic', href: '#/category/acoustic' },
+    { label: '베이스', key: 'category-bass', href: '#/category/bass' },
+    { label: '드럼', key: 'category-drums', href: '#/category/drums' },
+    { label: '악보집', key: 'bundles', href: '#/bundles' },
+    { label: '무료악보', key: 'free', href: '#/free' },
+    { label: '포인트충전', key: 'points', href: '#/points', accent: true },
   ];
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    window.setTimeout(() => searchButtonRef.current?.focus(), 0);
+  };
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    const onKeyDown = (event) => { if (event.key === 'Escape') closeSearch(); };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [searchOpen]);
+
+  const submitSearch = (event) => {
+    event.preventDefault();
+    closeSearch();
+    go('/search');
+  };
 
   return (
     <header style={{
@@ -320,70 +452,69 @@ function Header({ currentPage, onNavigate, cartCount = 2, notifCount = 3, pointB
       position: 'sticky', top: 0, zIndex: 50,
       boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
     }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', gap: 16 }}>
-        {/* Logo */}
-        <button onClick={() => onNavigate('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-          <span style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 20, fontWeight: 300, color: '#F97316' }}>Score</span>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 12px', height: 56, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <a href="#/" aria-label="ScoreStore 홈" style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, textDecoration: 'none' }}>
+          <span style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 20, fontWeight: 300, color: 'var(--accent-strong)' }}>Score</span>
           <span style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 20, fontWeight: 300, color: '#0F172A' }}>Store</span>
-          <span style={{ color: '#F97316', fontSize: 18, lineHeight: 1 }}>♪</span>
-        </button>
+          <span aria-hidden="true" style={{ color: 'var(--accent-strong)', fontSize: 18, lineHeight: 1 }}>♪</span>
+        </a>
 
-        {/* Desktop Nav */}
-        <nav style={{ display: 'flex', gap: 4, flex: 1 }} className="desktop-nav">
+        <nav aria-label="주요 메뉴" style={{ display: 'flex', gap: 4, flex: 1 }} className="desktop-nav">
           {navItems.map(item => (
-            <button key={item.key} onClick={() => onNavigate(item.key)} style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '6px 10px', borderRadius: 8,
+            <a key={item.key} href={item.href} style={{
+              padding: '6px 10px', borderRadius: 8, textDecoration: 'none',
               fontSize: 14, fontWeight: 500,
-              color: item.accent ? '#F97316' : currentPage === item.key ? '#F97316' : '#334155',
+              color: item.accent || currentPage === item.key ? 'var(--accent-strong)' : '#334155',
               fontFamily: 'inherit', transition: 'background 150ms'
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
-            onMouseLeave={e => e.currentTarget.style.background = 'none'}
-            >{item.label}</button>
+            }}>{item.label}</a>
           ))}
         </nav>
 
-        {/* Right actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
-          <div style={{ background: '#FEF3C7', color: '#92400E', borderRadius: 9999, padding: '4px 10px', fontSize: 12, fontWeight: 600, flexShrink: 0 }}>
-            💰 {pointBalance.toLocaleString()}P
-          </div>
-          <button onClick={() => setSearchOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, color: '#64748B', display: 'flex' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto', minWidth: 0 }}>
+          {demoUser && (
+            <div style={{ background: '#FEF3C7', color: 'var(--point-ink)', borderRadius: 9999, padding: '4px 8px', fontSize: 12, fontWeight: 600, flexShrink: 0 }}>
+              <span aria-hidden="true">◆</span> {demoUser.points.toLocaleString()}P
+            </div>
+          )}
+          <button ref={searchButtonRef} aria-label="악보 검색" onClick={() => setSearchOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: 8, color: '#64748B', display: 'flex' }}>
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
-          <button onClick={() => onNavigate('notifications')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, color: '#64748B', position: 'relative', display: 'flex' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            {notifCount > 0 && <span style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '1.5px solid white' }}></span>}
-          </button>
-          <button onClick={() => onNavigate('cart')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, color: '#64748B', position: 'relative', display: 'flex' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            {cartCount > 0 && <span style={{ position: 'absolute', top: 2, right: 2, background: '#F97316', color: '#fff', borderRadius: '50%', width: 16, height: 16, fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cartCount}</span>}
-          </button>
-          <button onClick={() => onNavigate('login')} style={{ background: '#F97316', color: '#fff', border: 'none', cursor: 'pointer', padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, fontFamily: 'inherit' }}>
-            로그인
-          </button>
+          <a href="#/notifications" className="hdr-desktop-only" aria-label={notifCount ? `알림, 읽지 않은 알림 ${notifCount}개` : '알림'} style={{ padding: 8, borderRadius: 8, color: '#64748B', position: 'relative', display: 'flex' }}>
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            {notifCount > 0 && <span aria-hidden="true" style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '1.5px solid white' }}></span>}
+          </a>
+          <a href="#/cart" className="hdr-desktop-only" aria-label={cartCount ? `장바구니, ${cartCount}개 담김` : '장바구니'} style={{ padding: 8, borderRadius: 8, color: '#64748B', position: 'relative', display: 'flex' }}>
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            {cartCount > 0 && <span aria-hidden="true" style={{ position: 'absolute', top: 3, right: 3, background: '#F97316', color: '#fff', borderRadius: '50%', minWidth: 16, height: 16, padding: '0 3px', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cartCount}</span>}
+          </a>
+          {demoUser ? (
+            <div className="hdr-desktop-only" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 12, color: '#334155', whiteSpace: 'nowrap' }}>{demoUser.name}</span>
+              <button onClick={onLogout} style={{ background: '#fff', color: '#64748B', border: '1px solid #E2E8F0', cursor: 'pointer', padding: '7px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600, fontFamily: 'inherit' }}>로그아웃</button>
+            </div>
+          ) : (
+            <a href="#/login" className="hdr-desktop-only" style={{ background: 'var(--accent-strong)', color: '#fff', padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>로그인</a>
+          )}
         </div>
       </div>
 
-      {/* Search overlay */}
       {searchOpen && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', zIndex: 100, display: 'flex', alignItems: 'flex-start', paddingTop: 80 }} onClick={() => setSearchOpen(false)}>
-          <div style={{ background: '#fff', width: '100%', maxWidth: 600, margin: '0 auto', borderRadius: 16, padding: 20, boxShadow: '0 20px 48px rgba(0,0,0,0.18)' }} onClick={e => e.stopPropagation()}>
+        <div role="dialog" aria-modal="true" aria-label="악보 검색" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', zIndex: 100, display: 'flex', alignItems: 'flex-start', padding: '80px 12px 0' }} onMouseDown={event => { if (event.target === event.currentTarget) closeSearch(); }}>
+          <form onSubmit={submitSearch} style={{ background: '#fff', width: '100%', maxWidth: 600, margin: '0 auto', borderRadius: 16, padding: 20, boxShadow: '0 20px 48px rgba(0,0,0,0.18)' }}>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="곡명, 아티스트, 편곡자 검색..." style={{ flex: 1, border: 'none', outline: 'none', fontSize: 16, fontFamily: 'inherit', color: '#0F172A' }} />
-              <button onClick={() => setSearchOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', fontSize: 20 }}>✕</button>
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input autoFocus value={searchQuery} onChange={event => setSearchQuery(event.target.value)} placeholder="곡명, 아티스트, 편곡자 검색..." style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', fontSize: 16, fontFamily: 'inherit', color: '#0F172A' }} />
+              <button type="button" aria-label="검색 닫기" onClick={closeSearch} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', fontSize: 20, padding: 8 }}>✕</button>
             </div>
             <div style={{ marginTop: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.08em', marginBottom: 8 }}>인기 검색어</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.08em', marginBottom: 8 }}>검색어 예시</div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {['한로로', '검정치마', 'AKMU', '아이유', '뉴진스'].map(t => (
-                  <span key={t} style={{ background: '#F1F5F9', color: '#334155', padding: '5px 12px', borderRadius: 9999, fontSize: 13, cursor: 'pointer' }} onClick={() => { setSearchQuery(t); }}>{t}</span>
+                {['한로로', '검정치마', 'AKMU', '아이유', '뉴진스'].map(term => (
+                  <button type="button" key={term} style={{ background: '#F1F5F9', color: '#334155', border: 0, padding: '5px 12px', borderRadius: 9999, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => setSearchQuery(term)}>{term}</button>
                 ))}
               </div>
             </div>
-          </div>
+          </form>
         </div>
       )}
     </header>
@@ -402,7 +533,7 @@ function DifficultyStars({ level = 3, size = 'sm' }) {
 
 function Badge({ type, children }) {
   const styles = {
-    free:   { background: '#D1FAE5', color: '#059669' },
+    free:   { background: '#D1FAE5', color: 'var(--free-ink)' },
     sale:   { background: '#FEE2E2', color: '#DC2626' },
     bundle: { background: '#E0E7FF', color: '#4F46E5' },
     new:    { background: '#1E293B', color: '#fff' },
@@ -418,14 +549,14 @@ function Badge({ type, children }) {
 
 function PriceDisplay({ price, discountPrice, isFree, large }) {
   const sz = large ? 20 : 15;
-  if (isFree) return <span style={{ fontSize: sz, fontWeight: 700, color: '#10B981' }}>무료</span>;
+  if (isFree) return <span style={{ fontSize: sz, fontWeight: 700, color: 'var(--free-ink)' }}>무료</span>;
   if (discountPrice) return (
     <span style={{ display: 'flex', alignItems: 'baseline', gap: 4, flexWrap: 'wrap' }}>
-      <span style={{ fontSize: 11, color: '#94A3B8', textDecoration: 'line-through' }}>₩{price.toLocaleString()}</span>
-      <span style={{ fontSize: sz, fontWeight: 700, color: '#EF4444' }}>₩{discountPrice.toLocaleString()}</span>
+      <span style={{ fontSize: 11, color: 'var(--ink-muted)', textDecoration: 'line-through' }}><span className="sr-only">정가 </span>{won(price)}</span>
+      <span style={{ fontSize: sz, fontWeight: 700, color: 'var(--sale-ink)' }}><span className="sr-only">판매가 </span>{won(discountPrice)}</span>
     </span>
   );
-  return <span style={{ fontSize: sz, fontWeight: 700, color: '#0F172A' }}>₩{price.toLocaleString()}</span>;
+  return <span style={{ fontSize: sz, fontWeight: 700, color: '#0F172A' }}>{won(price)}</span>;
 }
 
 const THUMB_GRADIENTS = [
@@ -437,122 +568,132 @@ const THUMB_GRADIENTS = [
   'linear-gradient(145deg,#312E81,#6366F1)',
 ];
 
-function ScoreCard({ score, onSelect, idx = 0 }) {
+function ScoreCard({ score, idx = 0 }) {
   const [wished, setWished] = useState(false);
   const [hovered, setHovered] = useState(false);
   const grad = score.thumbGradient || THUMB_GRADIENTS[idx % THUMB_GRADIENTS.length];
   const isBundle = score.type === 'bundle';
+  const href = isBundle ? `#/bundle/${score.id}` : `#/score/${score.id}`;
 
   return (
-    <div onClick={() => onSelect && onSelect(score)}
+    <article
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        width: '100%', background: '#fff',
+        width: '100%', background: '#fff', position: 'relative',
         border: '1px solid #E2E8F0', borderRadius: 12, overflow: 'hidden',
-        cursor: 'pointer', transition: 'all 150ms ease-out',
+        transition: 'all 150ms ease-out',
         boxShadow: hovered ? '0 4px 12px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.06)',
         transform: hovered ? 'translateY(-2px)' : 'translateY(0)'
       }}>
-      <div style={{ position: 'relative', background: grad, aspectRatio: isBundle ? '16/9' : '3/4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: isBundle ? 36 : 48, opacity: 0.15 }}>{isBundle ? '📚' : '♪'}</span>
-        <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-          {score.isFree && <Badge type="free">무료</Badge>}
-          {score.isNew && <Badge type="new">NEW</Badge>}
-          {score.discountPrice && !score.isFree && <Badge type="sale">SALE</Badge>}
-          {isBundle && <Badge type="bundle">악보집</Badge>}
+      <a href={href} style={{ display: 'block', color: 'inherit', textDecoration: 'none' }}>
+        <div style={{ position: 'relative', background: grad, aspectRatio: isBundle ? '16/9' : '3/4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span aria-hidden="true" style={{ fontSize: isBundle ? 36 : 48, opacity: 0.15 }}>{isBundle ? '📚' : '♪'}</span>
+          <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            {score.isFree && <Badge type="free">무료</Badge>}
+            {score.isNew && <Badge type="new">NEW</Badge>}
+            {score.discountPrice && !score.isFree && <Badge type="sale">할인 -{discountRate(score.price, score.discountPrice)}%</Badge>}
+            {isBundle && <Badge type="bundle">악보집</Badge>}
+          </div>
         </div>
-        {!isBundle && (
-          <button onClick={e => { e.stopPropagation(); setWished(!wished); }} style={{
-            position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', cursor: 'pointer',
-            color: wished ? '#EF4444' : 'rgba(255,255,255,0.7)', fontSize: 18, lineHeight: 1
-          }}>{wished ? '♥' : '♡'}</button>
-        )}
-      </div>
-      <div style={{ padding: '10px 12px 14px' }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', lineHeight: 1.35, marginBottom: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-          {score.title}
+        <div style={{ padding: '10px 12px 14px' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', lineHeight: 1.35, marginBottom: 2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            {score.title}
+          </div>
+          <div style={{ fontSize: 11, color: '#64748B', marginBottom: 6 }}>
+            {score.artist || score.subtitle}
+          </div>
+          {score.difficulty && <div style={{ marginBottom: 4 }}><DifficultyStars level={score.difficulty} /></div>}
+          <PriceDisplay price={score.price} discountPrice={score.discountPrice} isFree={score.isFree} />
         </div>
-        <div style={{ fontSize: 11, color: '#64748B', marginBottom: 6 }}>
-          {score.artist || score.subtitle}
-        </div>
-        {score.difficulty && <div style={{ marginBottom: 4 }}><DifficultyStars level={score.difficulty} /></div>}
-        <PriceDisplay price={score.price} discountPrice={score.discountPrice} isFree={score.isFree} />
-      </div>
-    </div>
+      </a>
+      {!isBundle && (
+        <button aria-pressed={wished} aria-label={`${score.title} 찜하기`} onClick={() => setWished(!wished)} style={{
+          position: 'absolute', top: 8, right: 8, zIndex: 2, background: 'rgba(15,23,42,.25)', border: 'none', borderRadius: '50%', width: 36, height: 36, cursor: 'pointer',
+          color: wished ? 'var(--sale-ink)' : '#fff', fontSize: 18, lineHeight: 1
+        }}>{wished ? '♥' : '♡'}</button>
+      )}
+    </article>
   );
 }
 
 /* ─── ScoreDetail ─────────────────────────────────────────── */
-function ScoreDetail({ score, onNavigate, onBack }) {
+function ScoreDetail({ score, demoUser, onAddCart, onToast }) {
   const [wished, setWished] = useState(false);
-  const pointBalance = 12300;
+  const pointBalance = demoUser?.points || 0;
   const canPayWithPoints = score && pointBalance >= (score.discountPrice || score.price || 0);
 
   if (!score) return null;
   const grad = score.thumbGradient || 'linear-gradient(145deg,#1E293B,#334155)';
+  const rate = discountRate(score.price, score.discountPrice);
+  const meta = [score.instrument, score.genre].filter(Boolean).join(' · ');
+  const metrics = [
+    score.key ? { label: '조성', value: score.key } : null,
+    score.bpm ? { label: 'BPM', value: String(score.bpm) } : null,
+    score.pages ? { label: '페이지', value: `${score.pages}p` } : null,
+    score.format ? { label: '형식', value: score.format } : null,
+  ].filter(Boolean);
 
   return (
-    <div style={{ background: '#F8FAFC', minHeight: '100vh', paddingBottom: 96 }}>
+    <div className="detail-page" style={{ background: '#F8FAFC', minHeight: '100vh', paddingBottom: 96 }}>
       <div style={{ background: grad, height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
         <span style={{ fontSize: 80, opacity: 0.12 }}>♪</span>
-        <button onClick={onBack} style={{ position: 'absolute', top: 16, left: 16, background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', color: '#fff', borderRadius: 8, padding: '6px 10px', fontSize: 18, backdropFilter: 'blur(8px)' }}>←</button>
+        <button aria-label="뒤로 가기" onClick={historyBackOrHome} style={{ position: 'absolute', top: 16, left: 16, background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 18, backdropFilter: 'blur(8px)' }}>←</button>
         <div style={{ position: 'absolute', bottom: 16, left: 16, display: 'flex', gap: 6 }}>
-          {score.isFree && <span style={{ background: '#D1FAE5', color: '#059669', padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>무료</span>}
-          {score.discountPrice && <span style={{ background: '#FEE2E2', color: '#DC2626', padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>TIME SALE -17%</span>}
+          {score.isFree && <span style={{ background: '#D1FAE5', color: 'var(--free-ink)', padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>무료</span>}
+          {rate > 0 && <span style={{ background: '#FEE2E2', color: 'var(--sale-ink)', padding: '3px 10px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>할인 -{rate}%</span>}
         </div>
       </div>
 
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px' }}>
         <div style={{ background: '#fff', borderRadius: 16, padding: '20px 20px 16px', marginTop: -24, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', position: 'relative', zIndex: 2 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', marginBottom: 4 }}>
-            {score.instrument} · {score.genre}
-          </div>
+          {meta && <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-muted)', letterSpacing: '0.06em', marginBottom: 4 }}>{meta}</div>}
           <h1 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 22, fontWeight: 300, lineHeight: 1.3, color: '#0F172A', marginBottom: 4 }}>{score.title}</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <span style={{ fontSize: 18, color: '#FBBF24', letterSpacing: 2 }}>
               {'★'.repeat(score.difficulty || 3)}{'☆'.repeat(5 - (score.difficulty || 3))}
             </span>
-            <span style={{ fontSize: 12, color: '#94A3B8' }}>/</span>
+            <span style={{ fontSize: 12, color: 'var(--ink-muted)' }}>/</span>
             <span style={{ fontSize: 17, color: '#334155', letterSpacing: 2 }}>
               {'●'.repeat(score.technique || 2)}{'○'.repeat(5 - (score.technique || 2))}
             </span>
           </div>
-          <div style={{ fontSize: 13, color: '#64748B', marginBottom: 10 }}>아티스트: <strong style={{ color: '#334155' }}>{score.artist}</strong> · 편곡: <strong style={{ color: '#334155' }}>{score.arranger || '김민수'}</strong></div>
+          {(score.artist || score.arranger) && (
+            <div style={{ fontSize: 13, color: '#64748B', marginBottom: 10 }}>
+              {score.artist && <>아티스트: <strong style={{ color: '#334155' }}>{score.artist}</strong></>}
+              {score.artist && score.arranger && ' · '}
+              {score.arranger && <>편곡: <strong style={{ color: '#334155' }}>{score.arranger}</strong></>}
+            </div>
+          )}
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            {score.discountPrice && <span style={{ fontSize: 14, color: '#94A3B8', textDecoration: 'line-through' }}>₩{score.price.toLocaleString()}</span>}
-            <span style={{ fontSize: 28, fontWeight: 700, color: score.isFree ? '#10B981' : '#0F172A' }}>
-              {score.isFree ? '무료' : `₩${(score.discountPrice || score.price).toLocaleString()}`}
+            {score.discountPrice && <span style={{ fontSize: 14, color: 'var(--ink-muted)', textDecoration: 'line-through' }}><span className="sr-only">정가 </span>{won(score.price)}</span>}
+            <span style={{ fontSize: 28, fontWeight: 700, color: score.isFree ? 'var(--free-ink)' : '#0F172A' }}>
+              {score.isFree ? '무료' : won(score.discountPrice || score.price)}
             </span>
-            {score.discountPrice && <span style={{ background: '#FEE2E2', color: '#DC2626', padding: '2px 8px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>-17%</span>}
+            {rate > 0 && <span style={{ background: '#FEE2E2', color: 'var(--sale-ink)', padding: '2px 8px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>-{rate}%</span>}
           </div>
 
-          {canPayWithPoints && (
-            <div style={{ background: '#FEF3C7', borderRadius: 8, padding: '8px 12px', marginTop: 10, fontSize: 12, color: '#92400E' }}>
-              💰 포인트로 구매 가능 — 보유 포인트: <strong>{pointBalance.toLocaleString()}P</strong>
+          {demoUser && canPayWithPoints && (
+            <div style={{ background: '#FEF3C7', borderRadius: 8, padding: '8px 12px', marginTop: 10, fontSize: 12, color: 'var(--point-ink)' }}>
+              <span aria-hidden="true">◆</span> 포인트로 구매 가능 — 보유 포인트: <strong>{pointBalance.toLocaleString()}P</strong>
             </div>
           )}
         </div>
 
-        <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginTop: 12, display: 'flex', gap: 20, flexWrap: 'wrap', border: '1px solid #E2E8F0' }}>
-          {[
-            { label: '조성', value: score.key || 'G장조' },
-            { label: 'BPM', value: score.bpm || '88' },
-            { label: '페이지', value: `${score.pages || 4}p` },
-            { label: '형식', value: 'TAB + 표준' },
-          ].map(m => (
+        {metrics.length > 0 && <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginTop: 12, display: 'flex', gap: 20, flexWrap: 'wrap', border: '1px solid #E2E8F0' }}>
+          {metrics.map(m => (
             <div key={m.label} style={{ textAlign: 'center', flex: 1, minWidth: 56 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', marginBottom: 2 }}>{m.label}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--ink-muted)', letterSpacing: '0.06em', marginBottom: 2 }}>{m.label}</div>
               <div style={{ fontSize: 14, fontWeight: 600, color: '#334155' }}>{m.value}</div>
             </div>
           ))}
-        </div>
+        </div>}
 
         <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginTop: 12, border: '1px solid #E2E8F0' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8 }}>🎵 미리듣기 (30초)</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-muted)', marginBottom: 8 }}>🎵 미리듣기 (30초)</div>
           <div style={{ background: '#F1F5F9', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button style={{ background: '#F97316', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '50%', width: 32, height: 32, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▶</button>
+            <button aria-label="미리듣기 재생" onClick={() => onToast('데모에서는 결제·다운로드·상담이 동작하지 않아요')} style={{ background: 'var(--accent-strong)', color: '#fff', border: 'none', cursor: 'pointer', borderRadius: '50%', width: 44, height: 44, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▶</button>
             <div style={{ flex: 1, height: 3, background: '#E2E8F0', borderRadius: 2, position: 'relative' }}>
               <div style={{ width: '30%', height: '100%', background: '#F97316', borderRadius: 2 }}></div>
             </div>
@@ -561,9 +702,9 @@ function ScoreDetail({ score, onNavigate, onBack }) {
         </div>
 
         <div style={{ background: '#fff', borderRadius: 12, padding: '14px 20px', marginTop: 12, border: '1px solid #E2E8F0' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8 }}>📄 샘플 미리보기 (1페이지)</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-muted)', marginBottom: 8 }}>📄 샘플 미리보기 (1페이지)</div>
           <div style={{ background: '#F8FAFC', borderRadius: 8, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #CBD5E1' }}>
-            <div style={{ textAlign: 'center', color: '#94A3B8' }}>
+            <div style={{ textAlign: 'center', color: 'var(--ink-muted)' }}>
               <div style={{ fontSize: 32, marginBottom: 4 }}>♩ ♩ ♩ ♩</div>
               <div style={{ fontSize: 12 }}>워터마크 샘플 PDF (1p)</div>
             </div>
@@ -571,40 +712,40 @@ function ScoreDetail({ score, onNavigate, onBack }) {
         </div>
 
         <div style={{ marginTop: 12, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {(score.tags || ['K-POP', '발라드', '통기타', '핑거스타일']).map(tag => (
+          {(score.tags || []).map(tag => (
             <span key={tag} style={{ background: '#F1F5F9', color: '#475569', padding: '4px 12px', borderRadius: 9999, fontSize: 12 }}>#{tag}</span>
           ))}
         </div>
       </div>
 
-      <div style={{
+      <div className="detail-cta" style={{
         position: 'fixed', bottom: 56, left: 0, right: 0,
         background: '#fff', padding: '12px 16px',
         boxShadow: '0 -4px 16px rgba(0,0,0,0.08)',
         display: 'flex', gap: 8, maxWidth: 640, margin: '0 auto',
         zIndex: 30
       }}>
-        <button onClick={() => setWished(!wished)} style={{
+        <button aria-pressed={wished} aria-label={`${score.title} 찜하기`} onClick={() => setWished(!wished)} style={{
           background: 'none', border: '1.5px solid #E2E8F0', borderRadius: 10,
           padding: '0 16px', cursor: 'pointer', fontSize: 18,
-          color: wished ? '#EF4444' : '#94A3B8'
+          color: wished ? 'var(--sale-ink)' : 'var(--ink-muted)'
         }}>{wished ? '♥' : '♡'}</button>
 
-        <button style={{
+        <button onClick={onAddCart} style={{
           flex: 1, background: '#F1F5F9', color: '#334155', border: 'none',
           borderRadius: 10, padding: '13px 0', cursor: 'pointer',
           fontFamily: 'inherit', fontWeight: 600, fontSize: 14
         }}>🛒 장바구니</button>
 
         {canPayWithPoints ? (
-          <button onClick={() => onNavigate('checkout')} style={{
-            flex: 1.2, background: '#FBBF24', color: '#92400E', border: 'none',
+          <button onClick={() => go('/checkout/' + score.id)} style={{
+            flex: 1.2, background: '#FBBF24', color: 'var(--point-ink)', border: 'none',
             borderRadius: 10, padding: '13px 0', cursor: 'pointer',
             fontFamily: 'inherit', fontWeight: 700, fontSize: 14
           }}>💰 포인트 결제</button>
         ) : (
-          <button onClick={() => onNavigate('checkout')} style={{
-            flex: 1.2, background: '#F97316', color: '#fff', border: 'none',
+          <button onClick={() => go('/checkout/' + score.id)} style={{
+            flex: 1.2, background: 'var(--accent-strong)', color: '#fff', border: 'none',
             borderRadius: 10, padding: '13px 0', cursor: 'pointer',
             fontFamily: 'inherit', fontWeight: 700, fontSize: 14
           }}>{score.isFree ? '🎁 무료 다운로드' : '💳 바로구매'}</button>
@@ -614,11 +755,43 @@ function ScoreDetail({ score, onNavigate, onBack }) {
   );
 }
 
+function BundleDetail({ bundle, onAddCart }) {
+  const rate = discountRate(bundle.price, bundle.discountPrice);
+  return (
+    <div className="detail-page" style={{ background: '#F8FAFC', minHeight: '100vh', paddingBottom: 112 }}>
+      <div style={{ background: bundle.thumbGradient, minHeight: 250, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        <span aria-hidden="true" style={{ fontSize: 80, opacity: .16 }}>📚</span>
+        <button aria-label="뒤로 가기" onClick={historyBackOrHome} style={{ position: 'absolute', top: 16, left: 16, background: 'rgba(255,255,255,.16)', color: '#fff', border: 0, borderRadius: 8, padding: '8px 12px', fontSize: 18, cursor: 'pointer' }}>←</button>
+      </div>
+      <div style={{ maxWidth: 640, margin: '-24px auto 0', padding: '0 16px', position: 'relative' }}>
+        <section style={{ background: '#fff', borderRadius: 16, padding: 20, boxShadow: '0 4px 12px rgba(0,0,0,.08)' }}>
+          <Badge type="bundle">악보집</Badge>
+          <h1 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 24, fontWeight: 300, margin: '10px 0 4px' }}>{bundle.title}</h1>
+          <p style={{ color: '#64748B', fontSize: 14, marginBottom: 16 }}>{bundle.subtitle}</p>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ color: 'var(--ink-muted)', textDecoration: 'line-through', fontSize: 14 }}><span className="sr-only">정가 </span>{won(bundle.price)}</span>
+            <strong style={{ fontSize: 28 }}>{won(bundle.discountPrice)}</strong>
+            <span style={{ background: '#FEE2E2', color: 'var(--sale-ink)', padding: '2px 8px', borderRadius: 9999, fontSize: 11, fontWeight: 700 }}>-{rate}%</span>
+          </div>
+        </section>
+        <section style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: 12, padding: 20, marginTop: 12 }}>
+          <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 18, fontWeight: 300, marginBottom: 6 }}>수록곡</h2>
+          <p style={{ color: '#64748B', fontSize: 14 }}>수록곡 목록은 준비 중이에요.</p>
+        </section>
+      </div>
+      <div className="detail-cta" style={{ position: 'fixed', bottom: 56, left: 0, right: 0, maxWidth: 640, margin: '0 auto', background: '#fff', padding: 12, boxShadow: '0 -4px 16px rgba(0,0,0,.08)', display: 'flex', gap: 8, zIndex: 30 }}>
+        <button onClick={onAddCart} style={{ flex: 1, border: 0, borderRadius: 10, padding: 13, background: '#F1F5F9', color: '#334155', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>장바구니</button>
+        <button onClick={() => go('/checkout/' + bundle.id)} style={{ flex: 1.2, border: 0, borderRadius: 10, padding: 13, background: 'var(--accent-strong)', color: '#fff', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{won(bundle.discountPrice)} 구매</button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── PointCharge ─────────────────────────────────────────── */
-function PointCharge({ onNavigate }) {
+function PointCharge({ demoUser, onToast }) {
   const [selected, setSelected] = useState(1);
   const [payMethod, setPayMethod] = useState('card');
-  const balance = 12300;
+  const balance = demoUser?.points || 0;
 
   const packages = [
     { id: 0, amount: 10000, bonus: 0 },
@@ -633,7 +806,7 @@ function PointCharge({ onNavigate }) {
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 100px', background: '#F8FAFC', minHeight: '100vh' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <button onClick={() => onNavigate('mypage')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', fontSize: 20, padding: 4 }}>←</button>
+        <button aria-label="뒤로 가기" onClick={historyBackOrHome} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', fontSize: 20, padding: 8 }}>←</button>
         <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>포인트 충전</h2>
       </div>
 
@@ -643,7 +816,7 @@ function PointCharge({ onNavigate }) {
         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>유효기간: 2027.04.18까지</div>
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', marginBottom: 10 }}>충전 패키지 선택</div>
+      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-muted)', letterSpacing: '0.06em', marginBottom: 10 }}>충전 패키지 선택</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
         {packages.map(p => {
           const pct = Math.round((p.bonus / p.amount) * 100);
@@ -657,10 +830,10 @@ function PointCharge({ onNavigate }) {
             }}>
               {p.hot && <div style={{ position: 'absolute', top: 0, right: 0, background: '#EF4444', color: '#fff', fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: '0 10px 0 8px' }}>🔥 BEST</div>}
               <div style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', marginBottom: 3 }}>{p.amount.toLocaleString()}P</div>
-              <div style={{ fontSize: 13, color: '#64748B', marginBottom: pct > 0 ? 4 : 0 }}>₩{p.amount.toLocaleString()}</div>
+              <div style={{ fontSize: 13, color: '#64748B', marginBottom: pct > 0 ? 4 : 0 }}>{won(p.amount)}</div>
               {pct > 0
-                ? <div style={{ fontSize: 11, fontWeight: 700, color: '#F97316' }}>+{p.bonus.toLocaleString()}P 보너스 ({pct}% 🎁)</div>
-                : <div style={{ fontSize: 11, color: '#CBD5E1' }}>보너스 없음</div>}
+               ? <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-strong)' }}>+{p.bonus.toLocaleString()}P 보너스 ({pct}% 🎁)</div>
+                : <div style={{ fontSize: 11, color: 'var(--ink-muted)' }}>보너스 없음</div>}
             </button>
           );
         })}
@@ -668,10 +841,10 @@ function PointCharge({ onNavigate }) {
 
       <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', marginBottom: 16, border: '1px solid #E2E8F0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14, color: '#64748B' }}>
-          <span>결제 금액</span><span style={{ fontWeight: 600, color: '#0F172A' }}>₩{pkg.amount.toLocaleString()}</span>
+          <span>결제 금액</span><span style={{ fontWeight: 600, color: '#0F172A' }}>{won(pkg.amount)}</span>
         </div>
         {pkg.bonus > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14, color: '#F97316' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 14, color: 'var(--accent-strong)' }}>
             <span>보너스 포인트</span><span style={{ fontWeight: 600 }}>+{pkg.bonus.toLocaleString()}P</span>
           </div>
         )}
@@ -680,7 +853,7 @@ function PointCharge({ onNavigate }) {
         </div>
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', marginBottom: 10 }}>결제 수단</div>
+      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-muted)', letterSpacing: '0.06em', marginBottom: 10 }}>결제 수단</div>
       <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
         {[
           { id: 'card', label: '💳 카드' },
@@ -696,14 +869,14 @@ function PointCharge({ onNavigate }) {
         ))}
       </div>
 
-      <button style={{
-        width: '100%', background: '#F97316', color: '#fff', border: 'none',
+      <button onClick={() => onToast('데모에서는 결제·다운로드·상담이 동작하지 않아요')} style={{
+        width: '100%', background: 'var(--accent-strong)', color: '#fff', border: 'none',
         borderRadius: 12, padding: '16px 0', fontSize: 16, fontWeight: 700,
         cursor: 'pointer', fontFamily: 'inherit'
       }}>
-        ₩{pkg.amount.toLocaleString()} 충전하기
+        {won(pkg.amount)} 충전하기
       </button>
-      <p style={{ fontSize: 11, color: '#94A3B8', textAlign: 'center', marginTop: 10, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 11, color: 'var(--ink-muted)', textAlign: 'center', marginTop: 10, lineHeight: 1.6 }}>
         포인트는 충전일로부터 1년간 유효하며, 현금 환불이 불가합니다.
       </p>
     </div>
@@ -757,69 +930,85 @@ const SIDEBAR_INSTRUMENTS = [
 ];
 
 /* ─── HomePage ────────────────────────────────────────────── */
-function Section({ title, children, onMore }) {
+function Section({ title, children, moreHref }) {
   return (
-    <div style={{ marginTop: 28 }}>
+    <section style={{ marginTop: 28 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 18, fontWeight: 300, color: '#0F172A' }}>{title}</h2>
-        <button onClick={onMore} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#94A3B8', fontFamily: 'inherit' }}>더보기 →</button>
+        {moreHref && <a href={moreHref} style={{ fontSize: 13, color: 'var(--ink-muted)', textDecoration: 'none' }}>더보기 →</a>}
       </div>
       {children}
-    </div>
+    </section>
   );
 }
 
-function ScoreGrid({ scores, onSelect }) {
+function ScoreGrid({ scores }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
-      {scores.map((s, i) => <ScoreCard key={s.id} score={s} idx={i} onSelect={onSelect} />)}
+      {scores.map((s, i) => <ScoreCard key={s.id} score={s} idx={i} />)}
     </div>
   );
 }
 
-function HomePage({ onSelectScore, onNavigate }) {
+function HomePage({ onToast }) {
   const [bannerIdx, setBannerIdx] = useState(0);
+  const [bannerPaused, setBannerPaused] = useState(false);
+  const [bannerHovered, setBannerHovered] = useState(false);
+  const [bannerFocused, setBannerFocused] = useState(false);
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const banners = [
-    { bg: 'linear-gradient(135deg,#0F172A 0%,#1E3A5F 100%)', title: '이달의 신곡 업데이트', sub: '매주 새로운 악보 추가', cta: '신곡 보기' },
-    { bg: 'linear-gradient(135deg,#7C3AED 0%,#4F46E5 100%)', title: '통기타 SEASON2 악보집', sub: '10곡 수록 · ₩18,000', cta: '악보집 보기' },
-    { bg: 'linear-gradient(135deg,#065F46 0%,#059669 100%)', title: '🎁 무료악보 이벤트', sub: '회원가입 시 악보 1곡 무료', cta: '무료악보 받기' },
+    { bg: 'linear-gradient(135deg,#0F172A 0%,#1E3A5F 100%)', title: '이달의 신곡 업데이트', sub: '매주 새로운 악보 추가', cta: '신곡 보기', href: '#/search' },
+    { bg: 'linear-gradient(135deg,#7C3AED 0%,#4F46E5 100%)', title: '통기타 SEASON2 악보집', sub: '10곡 수록 · ₩18,000', cta: '악보집 보기', href: '#/bundles' },
+    { bg: 'linear-gradient(135deg,#065F46 0%,#059669 100%)', title: '🎁 무료악보 이벤트', sub: '회원가입 시 악보 1곡 무료', cta: '무료악보 받기', href: '#/free' },
   ];
 
   useEffect(() => {
+    if (reducedMotion || bannerPaused || bannerHovered || bannerFocused) return;
     const t = setInterval(() => setBannerIdx(i => (i + 1) % banners.length), 4000);
     return () => clearInterval(t);
-  }, []);
+  }, [reducedMotion, bannerPaused, bannerHovered, bannerFocused]);
 
   const b = banners[bannerIdx];
 
   return (
     <div style={{ paddingBottom: 80 }}>
+      <h1 className="sr-only">ScoreStore 디지털 악보 마켓</h1>
       {/* Hero Banner */}
-      <div style={{ background: b.bg, padding: '40px 20px', textAlign: 'center', minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', transition: 'background 600ms ease', position: 'relative' }}>
+      <section aria-roledescription="슬라이드" aria-label={`${bannerIdx + 1} / ${banners.length}`} onMouseEnter={() => setBannerHovered(true)} onMouseLeave={() => setBannerHovered(false)} onFocusCapture={() => setBannerFocused(true)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setBannerFocused(false); }} style={{ background: b.bg, padding: '40px 20px', textAlign: 'center', minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', transition: 'background 600ms ease', position: 'relative' }}>
         <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 24, fontWeight: 300, color: '#fff', marginBottom: 6 }}>{b.title}</h2>
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 16 }}>{b.sub}</p>
-        <button style={{ background: '#F97316', color: '#fff', border: 'none', borderRadius: 9999, padding: '10px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{b.cta}</button>
+        <a href={b.href} style={{ background: 'var(--accent-strong)', color: '#fff', borderRadius: 9999, padding: '10px 24px', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>{b.cta}</a>
         <div style={{ display: 'flex', gap: 6, marginTop: 16 }}>
-          {banners.map((_, i) => <div key={i} style={{ width: i === bannerIdx ? 20 : 6, height: 6, borderRadius: 3, background: i === bannerIdx ? '#F97316' : 'rgba(255,255,255,0.4)', transition: 'all 300ms' }} />)}
+          {banners.map((slide, i) => <button key={slide.title} aria-label={`${i + 1}번 배너 보기`} onClick={() => setBannerIdx(i)} style={{ width: i === bannerIdx ? 20 : 12, height: 12, padding: 0, border: 0, borderRadius: 6, background: i === bannerIdx ? '#F97316' : 'rgba(255,255,255,0.5)', transition: 'all 300ms', cursor: 'pointer' }} />)}
         </div>
-      </div>
+        <button aria-label={bannerPaused ? '배너 자동 넘김 재생' : '배너 자동 넘김 정지'} onClick={() => setBannerPaused(value => !value)} style={{ position: 'absolute', right: 12, bottom: 10, width: 44, height: 44, borderRadius: '50%', border: '1px solid rgba(255,255,255,.5)', background: 'rgba(15,23,42,.45)', color: '#fff', cursor: 'pointer' }}>{bannerPaused ? '▶' : 'Ⅱ'}</button>
+      </section>
 
       {/* Instrument filter strip */}
       <div style={{ background: '#fff', padding: '16px 0', borderBottom: '1px solid #E2E8F0', overflowX: 'auto' }}>
         <div style={{ display: 'flex', gap: 0, minWidth: 'max-content', padding: '0 16px' }}>
           {INSTRUMENTS.map(inst => (
-            <button key={inst.label} onClick={() => onNavigate(inst.key)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 14px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
-              <span style={{ fontSize: 26 }}>{inst.emoji}</span>
+            <a key={inst.label} href={`#/category/${inst.key.replace('category-', '')}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 14px', color: 'inherit', textDecoration: 'none' }}>
+              <span aria-hidden="true" style={{ fontSize: 26 }}>{inst.emoji}</span>
               <span style={{ fontSize: 11, fontWeight: 500, color: '#475569', whiteSpace: 'nowrap' }}>{inst.label}</span>
-            </button>
+            </a>
           ))}
+          <span className="mobile-extra-instruments" aria-hidden="true"><span style={{ width: 1, alignSelf: 'stretch', background: '#E2E8F0', margin: '0 6px' }} /></span>
+          <span className="mobile-extra-instruments">
+            {SIDEBAR_INSTRUMENTS.map(inst => (
+              <a key={inst.label} href={`#/category/${inst.key.replace('category-', '')}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 14px', color: 'inherit', textDecoration: 'none' }}>
+                <span aria-hidden="true" style={{ fontSize: 24 }}>{inst.emoji}</span>
+                <span style={{ fontSize: 11, color: '#475569', whiteSpace: 'nowrap' }}>{inst.label}</span>
+              </a>
+            ))}
+          </span>
         </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
 
         {/* ── Left Sidebar ── */}
-        <div style={{
+        <div className="desktop-instrument-sidebar" style={{
           width: 68, flexShrink: 0,
           background: '#fff',
           borderRight: '1px solid #E2E8F0',
@@ -829,52 +1018,51 @@ function HomePage({ onSelectScore, onNavigate }) {
           paddingTop: 8, paddingBottom: 16,
         }}>
           {SIDEBAR_INSTRUMENTS.map(inst => (
-            <button key={inst.label} onClick={() => onNavigate(inst.key)} style={{
+            <a key={inst.label} href={`#/category/${inst.key.replace('category-', '')}`} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
               padding: '9px 4px', width: '100%',
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: 'inherit',
+              color: 'inherit', textDecoration: 'none',
             }}>
-              <span style={{ fontSize: 20 }}>{inst.emoji}</span>
+              <span aria-hidden="true" style={{ fontSize: 20 }}>{inst.emoji}</span>
               <span style={{ fontSize: 9, fontWeight: 500, color: '#475569', whiteSpace: 'nowrap', lineHeight: 1.3 }}>{inst.label}</span>
-            </button>
+            </a>
           ))}
         </div>
 
         {/* ── Main Content ── */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 12px' }}>
-            <Section title="🎁 무료 악보" onMore={() => {}}>
-              <ScoreGrid scores={SCORES.filter(s => s.isFree)} onSelect={onSelectScore} />
+            <Section title={<><span aria-hidden="true">🎁 </span>무료 악보</>} moreHref="#/free">
+              <ScoreGrid scores={SCORES.filter(s => s.isFree)} />
             </Section>
 
-            <Section title="🆕 신곡" onMore={() => {}}>
-              <ScoreGrid scores={SCORES.filter(s => s.isNew)} onSelect={onSelectScore} />
+            <Section title={<><span aria-hidden="true">🆕 </span>신곡</>} moreHref="#/search">
+              <ScoreGrid scores={SCORES.filter(s => s.isNew)} />
             </Section>
 
-            <Section title="🔥 인기곡 TOP 20" onMore={() => {}}>
+            <Section title="인기 악보" moreHref="#/search">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 {SCORES.slice(0, 5).map((s, i) => (
-                  <button key={s.id} onClick={() => onSelectScore(s)} style={{
+                  <a key={s.id} href={`#/score/${s.id}`} style={{
                     display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0',
-                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'inherit', textDecoration: 'none',
                     textAlign: 'left', width: '100%', fontFamily: 'inherit',
                     borderBottom: i < 4 ? '1px solid #F1F5F9' : 'none'
                   }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: i < 3 ? '#F97316' : '#94A3B8', width: 24, flexShrink: 0 }}>{i + 1}</span>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: i < 3 ? 'var(--accent-strong)' : 'var(--ink-muted)', width: 24, flexShrink: 0 }}>{i + 1}</span>
                     <div style={{ width: 40, height: 40, borderRadius: 8, background: s.thumbGradient || 'linear-gradient(145deg,#1E293B,#334155)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 16 }}>♪</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.title}</div>
                       <div style={{ fontSize: 11, color: '#64748B' }}>{s.artist}</div>
                     </div>
                     <PriceDisplay price={s.price} discountPrice={s.discountPrice} isFree={s.isFree} />
-                  </button>
+                  </a>
                 ))}
               </div>
             </Section>
 
-            <Section title="📚 악보집" onMore={() => {}}>
-              <ScoreGrid scores={BUNDLES} onSelect={onSelectScore} />
+            <Section title={<><span aria-hidden="true">📚 </span>악보집</>} moreHref="#/bundles">
+              <ScoreGrid scores={BUNDLES} />
             </Section>
           </div>
         </div>
@@ -882,73 +1070,105 @@ function HomePage({ onSelectScore, onNavigate }) {
       </div>
 
       {/* Kakao floating chat button */}
-      <button style={{
+      <button aria-label="카카오톡 상담" onClick={() => onToast('데모에서는 결제·다운로드·상담이 동작하지 않아요')} style={{
         position: 'fixed', bottom: 76, right: 16, zIndex: 50,
         background: '#FEE500', border: 'none', borderRadius: '50%',
         width: 52, height: 52, cursor: 'pointer', fontSize: 22,
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         display: 'flex', alignItems: 'center', justifyContent: 'center'
       }}>💬</button>
+      <footer className="demo-footer">ScoreStore UI 데모 · 곡 정보는 샘플 데이터예요</footer>
     </div>
   );
 }
 
 /* ─── CheckoutPage ────────────────────────────────────────── */
-function CheckoutPage({ score, onNavigate }) {
+function CheckoutPage({ product, demoUser, onOrderCreated }) {
   const [pointsUsed, setPointsUsed] = useState(0);
-  const balance = 12300;
-  const price = score ? (score.discountPrice || score.price || 0) : 2400;
+  const balance = demoUser?.points || 0;
+  const price = product.discountPrice || product.price || 0;
   const remain = Math.max(0, price - pointsUsed);
+
+  const updatePoints = (value) => setPointsUsed(clampPoints(value, balance, price));
+  const handlePay = () => {
+    const orderNo = createOrderNo();
+    const paid = price - pointsUsed;
+    const earned = Math.floor((paid * 3) / 100);
+    const order = {
+      orderNo, productId: product.id, title: product.title, price,
+      pointsUsed, paid, earned, createdAt: new Date().toISOString()
+    };
+    sessionStorage.setItem('ss_last_order', JSON.stringify(order));
+    onOrderCreated?.(order);
+    go('/complete/' + orderNo);
+  };
 
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 100px', background: '#F8FAFC', minHeight: '100vh' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <button onClick={() => onNavigate('detail')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', fontSize: 20, padding: 4 }}>←</button>
+        <button aria-label="뒤로 가기" onClick={historyBackOrHome} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', fontSize: 20, padding: 8 }}>←</button>
         <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>결제하기</h2>
       </div>
       <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', marginBottom: 12, border: '1px solid #E2E8F0' }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', marginBottom: 8 }}>주문 상품</div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>{score?.title || '기타) 한로로 - 사랑하게 될거야'}</div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', marginTop: 6 }}>₩{price.toLocaleString()}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-muted)', marginBottom: 8 }}>주문 상품</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>{product.title}</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', marginTop: 6 }}>{won(price)}</div>
       </div>
       <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', marginBottom: 12, border: '1px solid #E2E8F0' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8' }}>포인트 사용</div>
-          <span style={{ fontSize: 12, color: '#64748B' }}>보유: {balance.toLocaleString()}P</span>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input type="number" value={pointsUsed} onChange={e => setPointsUsed(Math.min(balance, Math.max(0, Number(e.target.value))))}
-            style={{ flex: 1, border: '1.5px solid #E2E8F0', borderRadius: 8, padding: '8px 12px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
-          <button onClick={() => setPointsUsed(Math.min(balance, price))} style={{ background: '#FFF7ED', color: '#F97316', border: '1.5px solid #F97316', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, fontSize: 13 }}>전액사용</button>
-        </div>
+        {demoUser ? <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink-muted)' }}>포인트 사용</div>
+            <span style={{ fontSize: 12, color: '#64748B' }}>보유: {balance.toLocaleString()}P</span>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input aria-label="사용할 포인트" type="number" inputMode="numeric" min={0} max={Math.min(balance, price)} value={pointsUsed} onChange={event => updatePoints(event.target.value)}
+              style={{ flex: 1, minWidth: 0, border: '1.5px solid #E2E8F0', borderRadius: 8, padding: '8px 12px', fontSize: 14, fontFamily: 'inherit', outline: 'none' }} />
+            <button onClick={() => updatePoints(price)} style={{ background: '#FFF7ED', color: 'var(--accent-strong)', border: '1.5px solid var(--accent-strong)', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap' }}>전액사용</button>
+          </div>
+        </> : <p style={{ fontSize: 14, color: '#64748B' }}>로그인하면 포인트를 쓸 수 있어요. <a href="#/login" style={{ color: 'var(--accent-strong)', fontWeight: 700 }}>로그인</a></p>}
       </div>
       <div style={{ background: '#fff', borderRadius: 12, padding: '16px 20px', marginBottom: 20, border: '1px solid #E2E8F0' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#64748B', marginBottom: 6 }}><span>상품 금액</span><span>₩{price.toLocaleString()}</span></div>
-        {pointsUsed > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#F97316', marginBottom: 6 }}><span>포인트 할인</span><span>-{pointsUsed.toLocaleString()}P</span></div>}
-        <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 700, color: '#0F172A' }}><span>결제 금액</span><span>₩{remain.toLocaleString()}</span></div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#64748B', marginBottom: 6 }}><span>상품 금액</span><span>{won(price)}</span></div>
+        {pointsUsed > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--accent-strong)', marginBottom: 6 }}><span>포인트 할인</span><span>-{pointsUsed.toLocaleString()}P</span></div>}
+        <div style={{ borderTop: '1px solid #F1F5F9', paddingTop: 8, display: 'flex', justifyContent: 'space-between', fontSize: 17, fontWeight: 700, color: '#0F172A' }}><span>결제 금액</span><span>{won(remain)}</span></div>
       </div>
-      <button onClick={() => onNavigate('complete')} style={{ width: '100%', background: remain === 0 ? '#FBBF24' : '#F97316', color: remain === 0 ? '#92400E' : '#fff', border: 'none', borderRadius: 12, padding: '16px 0', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-        {remain === 0 ? '💰 포인트 결제' : `₩${remain.toLocaleString()} 결제하기`}
+      <p style={{ color: '#64748B', fontSize: 12, textAlign: 'center', marginBottom: 10 }}>UI 데모예요. 실제 결제·다운로드는 되지 않아요.</p>
+      <button onClick={handlePay} style={{ width: '100%', background: remain === 0 ? '#FBBF24' : 'var(--accent-strong)', color: remain === 0 ? 'var(--point-ink)' : '#fff', border: 'none', borderRadius: 12, padding: '16px 0', fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+        {remain === 0 ? '◆ 포인트로 결제' : `${won(remain)} 결제하기`}
       </button>
     </div>
   );
 }
 
 /* ─── CompletePage ────────────────────────────────────────── */
-function CompletePage({ onNavigate }) {
+function CompletePage({ orderNo, onToast }) {
+  let order = null;
+  try {
+    const stored = JSON.parse(sessionStorage.getItem('ss_last_order') || 'null');
+    if (stored?.orderNo === orderNo) order = stored;
+  } catch (e) {}
+
+  if (!order) return (
+    <div style={{ maxWidth: 480, margin: '0 auto', padding: '60px 24px', textAlign: 'center', minHeight: '100vh' }}>
+      <h1 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 24, fontWeight: 300, marginBottom: 8 }}>주문 정보를 찾을 수 없어요</h1>
+      <p style={{ color: '#64748B', fontSize: 14, marginBottom: 24 }}>이 브라우저에서 완료한 주문인지 확인해 주세요.</p>
+      <a href="#/" style={{ display: 'inline-flex', background: 'var(--accent-strong)', color: '#fff', borderRadius: 10, padding: '12px 24px', textDecoration: 'none', fontWeight: 700 }}>홈으로</a>
+    </div>
+  );
+
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', padding: '60px 24px', textAlign: 'center', background: '#F8FAFC', minHeight: '100vh' }}>
-      <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-      <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 24, fontWeight: 300, color: '#0F172A', marginBottom: 8 }}>결제 완료!</h2>
-      <p style={{ fontSize: 14, color: '#64748B', marginBottom: 4 }}>기타) 한로로 - 사랑하게 될거야</p>
-      <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 24 }}>주문번호: <span style={{ fontFamily: 'monospace' }}>20250419-004821</span></p>
-      <div style={{ background: '#FEF3C7', borderRadius: 12, padding: '14px 20px', marginBottom: 24, fontSize: 14, color: '#92400E', fontWeight: 600 }}>
-        +72P 포인트 적립 완료!
+      <div aria-hidden="true" style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
+      <h1 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 24, fontWeight: 300, color: '#0F172A', marginBottom: 8 }}>결제 완료!</h1>
+      <p style={{ fontSize: 14, color: '#64748B', marginBottom: 4 }}>{order.title}</p>
+      <p style={{ fontSize: 13, color: 'var(--ink-muted)', marginBottom: 24 }}>주문번호: <span style={{ fontFamily: 'monospace' }}>{order.orderNo}</span></p>
+      <div style={{ background: '#FEF3C7', borderRadius: 12, padding: '14px 20px', marginBottom: 24, fontSize: 14, color: 'var(--point-ink)', fontWeight: 600 }}>
+        +{order.earned.toLocaleString()}P 포인트 적립 완료!
       </div>
-      <button style={{ width: '100%', background: '#F97316', color: '#fff', border: 'none', borderRadius: 12, padding: '14px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10 }}>
+      <button onClick={() => onToast('데모에서는 결제·다운로드·상담이 동작하지 않아요')} style={{ width: '100%', background: 'var(--accent-strong)', color: '#fff', border: 'none', borderRadius: 12, padding: '14px 0', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 10 }}>
         📄 악보 다운로드
       </button>
-      <button onClick={() => onNavigate('home')} style={{ width: '100%', background: '#fff', color: '#64748B', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 0', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+      <button onClick={() => go('/')} style={{ width: '100%', background: '#fff', color: '#64748B', border: '1px solid #E2E8F0', borderRadius: 12, padding: '14px 0', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
         홈으로 돌아가기
       </button>
     </div>
@@ -957,62 +1177,127 @@ function CompletePage({ onNavigate }) {
 
 /* ─── Placeholder pages ───────────────────────────────────── */
 const PAGE_LABELS = {
-  cart: '장바구니', mypage: '마이페이지', login: '로그인',
+  cart: '장바구니', mypage: '마이페이지',
   notifications: '알림 센터', search: '검색', bundles: '악보집',
   free: '무료 악보',
 };
 
-function PlaceholderPage({ page, onNavigate }) {
+function PlaceholderPage({ page }) {
   const label = PAGE_LABELS[page] || '카테고리';
   return (
     <div style={{ maxWidth: 480, margin: '0 auto', padding: '60px 24px', textAlign: 'center' }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>🎵</div>
-      <h2 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 22, fontWeight: 300, color: '#0F172A', marginBottom: 8 }}>{label}</h2>
-      <p style={{ fontSize: 14, color: '#94A3B8', marginBottom: 24 }}>UI 킷 프리뷰 — 이 화면은 추가 개발 예정입니다</p>
-      <button onClick={() => onNavigate('home')} style={{ background: '#F97316', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>← 홈으로</button>
+      <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 16 }}>🎵</div>
+      <h1 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 22, fontWeight: 300, color: '#0F172A', marginBottom: 8 }}>{label}</h1>
+      <p style={{ fontSize: 14, color: 'var(--ink-muted)', marginBottom: 24 }}>UI 킷 프리뷰 — 이 화면은 추가 개발 예정입니다</p>
+      <a href="#/" style={{ display: 'inline-flex', background: 'var(--accent-strong)', color: '#fff', borderRadius: 10, padding: '12px 24px', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>← 홈으로</a>
+    </div>
+  );
+}
+
+function LoginPage({ onLogin }) {
+  return (
+    <div style={{ maxWidth: 420, margin: '0 auto', padding: '72px 20px', textAlign: 'center' }}>
+      <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 12 }}>♪</div>
+      <h1 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 26, fontWeight: 300, marginBottom: 8 }}>로그인</h1>
+      <p style={{ color: '#64748B', fontSize: 14, marginBottom: 24 }}>UI 데모에서는 간편하게 데모 회원으로 시작할 수 있어요.</p>
+      <button onClick={onLogin} style={{ width: '100%', background: 'var(--accent-strong)', color: '#fff', border: 0, borderRadius: 10, padding: 14, fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>데모 회원으로 둘러보기</button>
+      <a href="#/" style={{ display: 'inline-block', marginTop: 16, color: '#64748B', fontSize: 14 }}>로그인 없이 계속</a>
+    </div>
+  );
+}
+
+function NotFound() {
+  return (
+    <div style={{ maxWidth: 480, margin: '0 auto', padding: '72px 24px', textAlign: 'center' }}>
+      <h1 style={{ fontFamily: "'MaruBuri','Noto Serif KR',serif", fontSize: 26, fontWeight: 300, marginBottom: 8 }}>페이지를 찾을 수 없어요</h1>
+      <p style={{ color: '#64748B', fontSize: 14, marginBottom: 24 }}>주소가 올바른지 확인하거나 홈에서 다시 시작해 주세요.</p>
+      <a href="#/" style={{ display: 'inline-flex', background: 'var(--accent-strong)', color: '#fff', borderRadius: 10, padding: '12px 24px', textDecoration: 'none', fontWeight: 700 }}>홈으로</a>
     </div>
   );
 }
 
 /* ─── Root App ────────────────────────────────────────────── */
-const PLACEHOLDER_PAGES = new Set(['search','cart','notifications','mypage','bundles','free','login','category-melody','category-piano','category-acoustic','category-electric','category-bass','category-ukulele','category-drums','category-kalimba','category-tongue-drum','category-harmonica','category-ocarina','category-color','category-violin','category-cello','category-flute','category-clarinet','category-oboe','category-trumpet','category-trombone','category-saxophone','category-horn','category-bassoon','category-tuba']);
+const PLACEHOLDER_PAGES = new Set(['search','cart','notifications','mypage','bundles','free']);
+const CATEGORY_KEYS = new Set([...INSTRUMENTS, ...SIDEBAR_INSTRUMENTS].map(item => item.key.replace('category-', '')));
 
 function App() {
-  const [page, setPage] = useState(() => localStorage.getItem('ss_page') || 'home');
-  const [selectedScore, setSelectedScore] = useState(null);
+  const route = useHashRoute();
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const [demoUser, setDemoUser] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('ss_demo_user') || 'null'); }
+    catch (e) { return null; }
+  });
+  const [cartCount, setCartCount] = useState(0);
+  const [toastMessage, setToastMessage] = useState('');
+  const toastTimer = useRef(null);
 
-  const navigate = (p) => {
-    setPage(p);
-    localStorage.setItem('ss_page', p);
-    window.scrollTo(0, 0);
+  const selectedScore = route.name === 'score' ? SCORES.find(score => String(score.id) === route.param) : null;
+  const selectedBundle = route.name === 'bundle' ? BUNDLES.find(bundle => String(bundle.id) === route.param) : null;
+  const checkoutProduct = route.name === 'checkout'
+    ? [...SCORES, ...BUNDLES].find(product => String(product.id) === route.param)
+    : null;
+  const page = route.name === 'score' ? 'detail'
+    : route.name === 'bundle' ? 'bundle-detail'
+    : route.name === 'category' ? `category-${route.param}`
+    : route.name;
+
+  const validRoute = route.name === 'home'
+    || (route.name === 'score' && !!selectedScore)
+    || (route.name === 'bundle' && !!selectedBundle)
+    || (route.name === 'category' && CATEGORY_KEYS.has(route.param))
+    || (route.name === 'checkout' && !!checkoutProduct)
+    || (route.name === 'complete' && !!route.param)
+    || route.name === 'points'
+    || route.name === 'login'
+    || PLACEHOLDER_PAGES.has(route.name);
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastMessage(''), 2500);
   };
 
-  useEffect(() => { window.__ssNavigate = navigate; }, []);
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
 
-  const handleSelectScore = (score) => {
-    setSelectedScore(score);
-    navigate('detail');
+  const persistDemoUser = (user) => {
+    setDemoUser(user);
+    if (user) sessionStorage.setItem('ss_demo_user', JSON.stringify(user));
+    else sessionStorage.removeItem('ss_demo_user');
+  };
+  const login = () => { persistDemoUser({ name: '데모 회원', points: 12300 }); go('/'); };
+  const logout = () => { persistDemoUser(null); showToast('로그아웃했어요'); };
+  const addCart = () => {
+    setCartCount(count => count + 1);
+    showToast('장바구니에 담았어요 (데모)');
+  };
+  const handleOrderCreated = (order) => {
+    if (!demoUser) return;
+    persistDemoUser({ ...demoUser, points: demoUser.points - order.pointsUsed + order.earned });
   };
 
-  const isMobile = window.innerWidth < 768;
   const hideChrome = page === 'complete' || page === 'checkout';
 
   return (
     <div style={{ minHeight: '100vh', background: '#F8FAFC' }}>
-      {!hideChrome && <Header currentPage={page} onNavigate={navigate} />}
+      {!hideChrome && <Header currentPage={page} cartCount={cartCount} notifCount={0} demoUser={demoUser} onLogout={logout} />}
 
-      <div style={{ paddingBottom: isMobile ? 72 : 0 }}>
-        {page === 'home'     && <HomePage onSelectScore={handleSelectScore} onNavigate={navigate} />}
-        {page === 'detail'   && <ScoreDetail score={selectedScore || SCORES[0]} onNavigate={navigate} onBack={() => navigate('home')} />}
-        {page === 'points'   && <PointCharge onNavigate={navigate} />}
-        {page === 'checkout' && <CheckoutPage score={selectedScore} onNavigate={navigate} />}
-        {page === 'complete' && <CompletePage onNavigate={navigate} />}
-        {PLACEHOLDER_PAGES.has(page) && <PlaceholderPage page={page} onNavigate={navigate} />}
-      </div>
+      <main id="main" tabIndex={-1} style={{ paddingBottom: isMobile && !hideChrome ? 'calc(var(--tabbar-h) + env(safe-area-inset-bottom))' : 0 }}>
+        {!validRoute && <NotFound />}
+        {validRoute && page === 'home' && <HomePage onToast={showToast} />}
+        {validRoute && page === 'detail' && <ScoreDetail score={selectedScore} demoUser={demoUser} onAddCart={addCart} onToast={showToast} />}
+        {validRoute && page === 'bundle-detail' && <BundleDetail bundle={selectedBundle} onAddCart={addCart} />}
+        {validRoute && page === 'points' && <PointCharge demoUser={demoUser} onToast={showToast} />}
+        {validRoute && page === 'checkout' && <CheckoutPage product={checkoutProduct} demoUser={demoUser} onOrderCreated={handleOrderCreated} />}
+        {validRoute && page === 'complete' && <CompletePage orderNo={route.param} onToast={showToast} />}
+        {validRoute && page === 'login' && <LoginPage onLogin={login} />}
+        {validRoute && route.name === 'category' && <PlaceholderPage page={page} />}
+        {validRoute && PLACEHOLDER_PAGES.has(page) && <PlaceholderPage page={page} />}
+      </main>
 
       {isMobile && !hideChrome && (
-        <BottomTabBar currentPage={page} onNavigate={navigate} />
+        <BottomTabBar currentPage={page} cartCount={cartCount} notifCount={0} />
       )}
+      {toastMessage && <div className="toast-status" role="status">{toastMessage}</div>}
     </div>
   );
 }
